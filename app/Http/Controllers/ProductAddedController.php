@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\Order;
 use App\Models\Product;
+use App\Models\Product_branch;
 use App\Models\ProductAdded;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +44,10 @@ class ProductAddedController extends Controller
     public function store(Request $request)
     {
         $errors = [];
+        $order = Order::create([
+            'branch_id' => $request->branch_id,
+        ]);
+        $order_id = $order->id;
         foreach ($request->product as $product_added) {
             if (!empty($product_added['product_id'])) {
                 if ($product_added['product_id'] != null && $product_added['qty'] != null && $product_added['qty'] != 0) {
@@ -50,12 +56,24 @@ class ProductAddedController extends Controller
                         $errors = "مخزون الـ" . $product->name . ' اقل من الكمية المنصرفة';
                     } else {
                         DB::beginTransaction();
-
+                        $product_on_branch = Product_branch::where(['product_id' => $product_added['product_id'], 'branch_id' => $request['branch_id']])->first();
+                        if (!empty($product_on_branch)) {
+                            $product_on_branch->update(['price' => $product->price]);
+                            $product_on_branch->increment('qty', $product_added['qty']);
+                        } else {
+                            Product_branch::create([
+                                'product_id' => $product_added['product_id'],
+                                'branch_id' => $request->branch_id,
+                                'qty' => $product_added['qty'],
+                                'price' => $product->price,
+                            ]);
+                        }
                         productAdded::create([
                             'product_id' => $product_added['product_id'],
                             'price' => $product->price,
                             'branch_id' => $request->branch_id,
-                            'qty' => $product_added['qty']
+                            'qty' => $product_added['qty'],
+                            'order_id' => $order_id,
                         ]);
 
                         $product->decrement('stock', $product_added['qty']);

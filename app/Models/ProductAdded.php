@@ -13,7 +13,8 @@ class ProductAdded extends Model
         'branch_id',
         'product_id',
         'qty',
-        'price'
+        'price',
+        'order_id'
     ];
 
     public function product()
@@ -24,5 +25,10 @@ class ProductAdded extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
     }
 }

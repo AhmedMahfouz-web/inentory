@@ -17,7 +17,7 @@
             </div>
             <div class="row g-3 mt-3">
                 <div class="col-md-6">
-                    <label for="select2Basic" class="mb-2 text-light fw-semibold">القسم</label>
+                    <label for="select2Basic" class="mb-2 text-light fw-semibold">التصنيف</label>
                     <select class="select2 select2Basic form-select form-select" name="category" data-allow-clear="true">
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -54,5 +54,4 @@
 
 @section('js')
     <script src="{{ asset('js/forms-selects.js') }}"></script>
-
 @endsection

@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Start extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['product_branch_id', 'month', 'qty'];
 }

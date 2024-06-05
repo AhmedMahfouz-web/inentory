@@ -109,7 +109,6 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script>
         let backdrop = document.getElementById('backdrop');
         let new_record = document.getElementById('add_new_record');

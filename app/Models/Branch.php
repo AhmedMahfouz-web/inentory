@@ -12,4 +12,10 @@ class Branch extends Model
     protected $fillable = [
         'name'
     ];
+
+
+    public function product_branches()
+    {
+        return $this->hasMany(Product_branch::class);
+    }
 }

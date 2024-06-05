@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\IncreasedProduct;
 use App\Models\Product;
 use App\Models\Supplier;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -23,7 +24,7 @@ class IncreasedProductController extends Controller
             $increased_products = IncreasedProduct::whereDate('created_at', '>=', $start_date)
                 ->whereDate('created_at', '<=', $end_date)
                 ->with(['product' => function ($q) {
-                    $q->with(['category', 'unit']);
+                    $q->with(['sub_category', 'unit']);
                 }, 'supplier'])->latest()->get();
             return view('pages.increased_product.index', compact('increased_products', 'start_date', 'end_date'));
         }

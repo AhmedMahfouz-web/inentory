@@ -15,23 +15,13 @@
         <h4 class="fw-bold py-3 mb-4 d-none" id="table_title">قائمة الاصناف</h4>
         <div class="card">
             <div class="card-datatable table-responsive pt-0">
-                <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5">
                     <div id="table_header" class="card-header flex-column flex-md-row">
                         <div class="head-label text-center">
                             <h5 class="card-title mb-0">قائمة الاصناف</h5>
                         </div>
-                        <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                        <div class="dt-action-buttons d-flex flex-row-reverse text-end pt-3 pt-md-0" id="btn_container">
                             <div class="dt-buttons btn-group flex-wrap">
-                                <div class="btn-group">
-                                    <button
-                                        class="btn btn-secondary buttons-collection dropdown-toggle btn-label-primary me-2"
-                                        tabindex="0" aria-controls="DataTables_Table_0" type="button"
-                                        aria-haspopup="dialog" aria-expanded="false">
-                                        <span><i class="ti ti-file-export me-sm-1"></i> <span
-                                                class="d-none d-sm-inline-block">Export</span></span><span
-                                            class="dt-down-arrow"></span>
-                                    </button>
-                                </div>
                                 <button class="btn btn-secondary create-new btn-primary" tabindex="0"
                                     aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
                                     <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">تعريف
@@ -40,30 +30,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-12 col-md-6">
-                            <div class="dataTables_length" id="DataTables_Table_0_length"><label>Show <select
-                                        name="DataTables_Table_0_length" aria-controls="DataTables_Table_0"
-                                        class="form-select form-select-sm">
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="75">75</option>
-                                        <option value="100">100</option>
-                                    </select> entries</label></div>
-                        </div>
-                        <div class="col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end">
-                            <div id="DataTables_Table_0_filter" class="dataTables_filter"><label>Search:<input
-                                        type="search" class="form-control form-control-sm" id="search_inout" placeholder=""
-                                        aria-controls="DataTables_Table_0"></label></div>
-                        </div>
+                    <div class="col-sm-6 col-md-3">
+                        <label class="form-label">بحث :</label>
+                        <input type="search" class="form-control" id="search_input" placeholder=""
+                            aria-controls="DataTables_Table_0">
                     </div>
-                    <button id="add_btn" type="button" class="d-none">تعريف صنف جديدة</button>
-                    <table id="table" class="datatables-basic table">
+                    <table id="data_table" class="datatables-basic display table nowrap table-hover">
                         <thead>
                             <tr>
                                 <th>الكود</th>
                                 <th>الاسم</th>
+                                <th>التصنيف</th>
                                 <th>القسم</th>
                                 <th>الوحدة</th>
                                 <th>الكمية</th>
@@ -80,7 +57,10 @@
                                         <a href="{{ route('edit product', $product->id) }}">{{ $product->name }} </a>
                                     </td>
                                     <td>
-                                        {{ $product->category->name }}
+                                        {{ $product->sub_category->name }}
+                                    </td>
+                                    <td>
+                                        {{ $product->sub_category->category->name }}
                                     </td>
                                     <td>
                                         {{ $product->unit->name }}
@@ -132,7 +112,7 @@
                     </div>
                 </div>
                 <div class="col-sm-12 mt-3">
-                    <label for="select2Basic" class="mb-2 text-light fw-semibold">القسم</label>
+                    <label for="select2Basic" class="mb-2 text-light fw-semibold">التصنيف</label>
                     <select class="select2 form-select form-select" name="category" data-allow-clear="true">
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -174,7 +154,6 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script>
         let backdrop = document.getElementById('backdrop');
         let new_record = document.getElementById('add_new_record');
@@ -194,34 +173,85 @@
             backdrop.classList.remove('fade');
             backdrop.classList.remove('show');
         });
+    </script>
+    <script src="{{ asset('vendor/libs/moment/moment.js') }}"></script>
+    <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
+    <script src="{{ asset('vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
+    <script src="{{ asset('vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
+    <script src="{{ asset('vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
+    <script src="{{ asset('vendor/libs/pickr/pickr.js') }}"></script>
 
-        let search = document.getElementById("search_inout");
+    <script src="{{ asset('js/forms-pickers.js') }}"></script>
+    {{-- <script src="{{ asset('js/tables-datatables-basic.js') }}"></script> --}}
+    <script src="{{ asset('js/forms-selects.js') }}"></script>
+    <script src="{{ asset('js/dataTables.bootstrap.js') }}"></script>
+    <script src="{{ asset('js/dataTables.dataTables.js') }}"></script>
+    <script src="{{ asset('vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+    <script>
+        let table = $("#data_table").DataTable({
+            "searching": false,
+            scrollX: true,
+            "language": {
+                "emptyTable": "لم يضاف اي صنف الي هذا المخزن بعد"
+            },
+            order: [
+                [0, 'asc']
+            ],
+            pagingType: 'simple_numbers',
+            "iDisplayLength": 100,
+            className: 'nowrap',
+            dom: 'Bftip',
+            buttons: [{
+                extend: 'collection',
+                text: '<i class="tf-icons ti ti-file-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
+                className: 'btn-label-primary me-2',
+
+
+                buttons: [{
+                        extend: 'excelHtml5',
+                        // className: "new-success waves-effect",
+                        text: '<i class="ti ti-file-spreadsheet"></i> Excel',
+                        title: 'اصناف المخزن'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        // className: "new-danger waves-effect",
+                        text: '<i class="ti ti-file-type-pdf"></i> PDF',
+                        title: 'اصناف المخزن'
+                    }
+                ],
+            }]
+
+        });
+        table.buttons().container()
+            .appendTo('#btn_container');
+        // document.ready(function() {
+        //     $("#data_table").addClass('table-hover');
+        // });
+        let search = document.getElementById("search_input");
         search.addEventListener('keyup', search_on_table);
 
         function search_on_table() {
             // Declare variables
-            let input, table, tr, name, category, i, txtValue;
-            input = document.getElementById("search_inout");
+            let input, table, tr, td, i, txtValue;
+            input = this;
             filter = input.value
-            table = document.getElementById("table");
+            table = document.getElementById("data_table");
             tr = table.getElementsByTagName("tr");
 
             // Loop through all table rows, and hide those who don't match the search query
             for (i = 0; i < tr.length; i++) {
-                name = tr[i].getElementsByTagName("td")[1];
-                category = tr[i].getElementsByTagName("td")[2];
-                if (name || category) {
-                    txtValue = name.textContent || name.innerText;
-                    categoryValue = category.textContent || category.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1 || categoryValue.toUpperCase().indexOf(filter) > -1) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
                     }
+
                 }
             }
         }
     </script>
-    {{-- <script src="{{ asset('js/tables-datatables-basic.js') }}"></script> --}}
-    <script src="{{ asset('js/forms-selects.js') }}"></script>
 @endsection

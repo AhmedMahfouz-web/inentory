@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\SubCategory;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 
@@ -11,8 +12,10 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->orderBy('code', 'asc')->get();
-        $categories = Category::all();
+        $products = Product::with(['sub_category' => function ($q) {
+            $q->with('category');
+        }])->orderBy('code', 'asc')->get();
+        $categories = SubCategory::all();
         $units = Unit::all();
 
         return view('pages.product.index', compact(['products', 'categories', 'units']));
@@ -20,7 +23,7 @@ class ProductController extends Controller
 
     public function create()
     {
-        $categories = Category::all();
+        $categories = SubCategory::all();
         $units = Unit::all();
 
         return view('pages.product.create', compact(['categories', 'units']));
@@ -35,7 +38,7 @@ class ProductController extends Controller
             'unit' => 'required',
         ]);
 
-        $category_code = Category::where('id', $request->category)->select('code')->first();
+        $category_code = SubCategory::where('id', $request->category)->select('code')->first();
 
         $product = Product::create([
             'name' => $request->name,
@@ -52,7 +55,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $categories = Category::all();
+        $categories = SubCategory::all();
         $units = Unit::all();
 
         return view('pages.product.edit', compact(['product', 'categories', 'units']));
@@ -85,5 +88,57 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('show products')->with(['success' => 'تم ازالة الصنف بنجاح']);
+    }
+
+    public function inventory(Request $request)
+    {
+        if (!empty($request->start_date)) {
+            $start = explode('-', $request->start_date, 3)[0] . '-' . explode('-', $request->start_date, 3)[1] . '-01';
+            $end = explode('-', $request->start_date, 3)[0] . '-' . explode('-', $request->start_date, 3)[1] . '-31';
+            $products = Product::with([
+                'start' => function ($q) use ($start) {
+                    $q->where('month', $start);
+                }
+            ])->withSum(
+                [
+                    'product_added' => function ($q) use ($start, $end) {
+                        $q->whereBetween('created_at', [$start, $end]);
+                    }
+                ],
+                'qty'
+            )->withSum(
+                [
+                    'sell' => function ($q) use ($start, $end) {
+                        $q->whereBetween('created_at', [$start, $end]);
+                    }
+                ],
+                'qty'
+            )->get();
+        } else {
+
+            $start = date('Y-m') . '-01';
+            $products = Product::with([
+                'start' => function ($q) use ($start) {
+                    $q->where('month', $start);
+                },
+            ])
+                ->withSum(
+                    [
+                        'product_added' => function ($q) {
+                            $q->whereBetween('created_at', [date('Y-m') . '-01', date('Y-m') . '-31']);
+                        }
+                    ],
+                    'qty'
+                )->withSum(
+                    [
+                        'sell' => function ($q) {
+                            $q->whereBetween('created_at', [date('Y-m') . '-01', date('Y-m') . '-31']);
+                        }
+                    ],
+                    'qty'
+                )->get();
+        }
+
+        return view('pages.product.inventory', compact('products', 'start'));
     }
 }

@@ -122,9 +122,6 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
-
-
     <script src="{{ asset('vendor/libs/moment/moment.js') }}"></script>
     <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
     <script src="{{ asset('vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
@@ -137,6 +134,7 @@
     <script src="{{ asset('js/forms-selects.js') }}"></script>
     <script src="{{ asset('js/dataTables.bootstrap.js') }}"></script>
     <script src="{{ asset('js/dataTables.dataTables.js') }}"></script>
+    <script src="{{ asset('vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script>
         let table = $("#data_table").DataTable({
             "searching": false,
@@ -144,7 +142,7 @@
                 "emptyTable": "اختر التاريخ اولا."
             },
             order: [
-                [0, 'desc']
+                [0, 'asc']
             ],
             "iDisplayLength": 25,
             @if (!empty($start_date))
@@ -165,11 +163,11 @@
             @endif
 
         });
+
         @if (!empty($start_date))
             table.buttons().container()
                 .appendTo('#table_header');
         @endif
-
         $document.ready(function() {
             $("#data_table").addClass('table-hover');
         });

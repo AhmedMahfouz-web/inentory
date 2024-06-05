@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('starts', function (Blueprint $table) {
+        Schema::create('start__inventories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_branch_id')->references('id')->on('product_branches');
+            $table->foreignId('product_id')->references('id')->on('products');
             $table->unsignedMediumInteger('qty');
-            $table->unsignedSmallInteger('month');
+            $table->timestamp('month');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('starts');
+        Schema::dropIfExists('start__inventories');
     }
 };

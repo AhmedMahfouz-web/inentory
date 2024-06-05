@@ -20,13 +20,28 @@ class Product extends Model
         'max_stock',
     ];
 
-    public function category()
+    public function sub_category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(SubCategory::class,  'category_id', 'id');
     }
 
     public function unit()
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function start()
+    {
+        return $this->hasMany(Start_Inventory::class, 'product_id', 'id');
+    }
+
+    public function product_added()
+    {
+        return $this->hasMany(IncreasedProduct::class, 'product_id', 'id');
+    }
+
+    public function sell()
+    {
+        return $this->hasMany(ProductAdded::class, 'product_id', 'id');
     }
 }

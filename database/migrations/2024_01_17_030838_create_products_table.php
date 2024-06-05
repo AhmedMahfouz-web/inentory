@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedDecimal('price', $scale = 20)->default(0);
             $table->unsignedInteger('min_stock')->nullable();
             $table->unsignedInteger('max_stock')->nullable();
-            $table->foreignId('category_id')->references('id')->on('categories');
+            $table->foreignId('category_id')->references('id')->on('sub_categories');
             $table->foreignId('unit_id')->references('id')->on('units');
             $table->timestamps();
         });

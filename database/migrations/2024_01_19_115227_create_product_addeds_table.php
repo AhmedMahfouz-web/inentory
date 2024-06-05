@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('product_id')->references('id')->on('products');
             $table->unsignedInteger('qty');
             $table->foreignId('branch_id')->references('id')->on('branches');
+            $table->foreignId('order_id')->references('id')->on('orders');
             $table->unsignedDecimal('price', $scale = 20);
             $table->timestamps();
         });
