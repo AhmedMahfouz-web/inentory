@@ -24,7 +24,7 @@
                 <div class="col-12 mt-5">
                     <h6 class="" for="">الصلاحيات :</h6>
                     @foreach ($permissions as $permission)
-                        <div class="col-md-2 form-check form-check-inline mx-4 my-2">
+                        <div class="col-md-2 form-check form-check-inline mx-5 my-2">
                             <input class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox"
                                 id="permission{{ $permission->id }}" value="{{ $permission->name }}" />
                             <label class="form-check-label"
