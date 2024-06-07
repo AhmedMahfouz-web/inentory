@@ -239,5 +239,23 @@
                 </li>
             </ul>
         </li>
+        <li class="menu-item {{ Request::is('roles/*', 'roles') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon ti ti-briefcase"></i>
+                <div data-i18n="الوظائف">الوظائف</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ Request::is('roles') ? 'active' : '' }}">
+                    <a href="{{ route('show roles') }}" class="menu-link">
+                        <div data-i18n="عرض الوظائف">عرض الوظائف</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('roles/create') ? 'active' : '' }}">
+                    <a href="{{ route('create role') }}" class="menu-link">
+                        <div data-i18n="اضافة وظيفة">اضافة وظيفة</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
     </ul>
 </aside>

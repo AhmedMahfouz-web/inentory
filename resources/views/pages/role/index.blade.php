@@ -66,11 +66,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $user)
+                            @foreach ($roles as $role)
                                 <tr>
-                                    <td>{{ $user->id }}</td>
+                                    <td>{{ $role->id }}</td>
                                     <td>
-                                        <a href="{{ route('edit user', $user->id) }}">{{ $user->name }} </a>
+                                        <a href="{{ route('edit role', $role->id) }}">{{ $role->name }} </a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -89,7 +89,7 @@
         </div>
         <div class="offcanvas-body flex-grow-1">
             <form class="add-new-record pt-0 row g-2" id="form-add-new-record" method="post"
-                action="{{ route('store user') }}">
+                action="{{ route('store role') }}">
                 @csrf
                 <div class="col-sm-12">
                     <label class="form-label" for="basicFullname">اسم الوحدة</label>

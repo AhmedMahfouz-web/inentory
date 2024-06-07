@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductAddedController;
 use App\Http\Controllers\ProductBranchController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SellController;
 use App\Http\Controllers\StartController;
 use App\Http\Controllers\StartInventoryController;
@@ -131,12 +132,21 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('{branch_id}', 'index')->name('sell');
         Route::post('{branch_id}', 'store')->name('sell product');
     });
+
     Route::group(['prefix' => 'users', 'controller' => UsersController::class], function ($router) {
         Route::get('users', 'index')->name('show users');
         Route::get('/create', 'create')->name('create user');
         Route::post('/store', 'store')->name('store user');
         Route::get('/edit/{user}', 'edit')->name('edit user');
         Route::post('/update/{user}', 'update')->name('update user');
+    });
+
+    Route::group(['prefix' => 'roles', 'controller' => RolesController::class], function ($router) {
+        Route::get('/', 'index')->name('show roles');
+        Route::get('/create', 'create')->name('create role');
+        Route::post('/store', 'store')->name('store role');
+        Route::get('/edit/{user}', 'edit')->name('edit role');
+        Route::post('/update/{user}', 'update')->name('update role');
     });
 });
 
