@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -35,7 +36,19 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // $user = User::create([
+        //     'name' => $request->name,
+        //     'username' => $request->username,
+        //     'email' => $request->email,
+        //     'password' => Hash::make($request->password),
+        // ]);
+        $user = User::find(11);
+        return $user->getPermissionNames();
+        foreach ($request->permissions as $permission) {
+            $user->givePermissionTo($permission);
+        };
+
+        return redirect()->route('home')->with('success', 'تم اضافة المستخدم بنجاح');
     }
 
     /**

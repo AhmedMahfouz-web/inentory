@@ -27,12 +27,12 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label" for="email">البريد الاليكترونى</label>
-                    <input type="text" id="email" name="email" class="form-control"
+                    <input type="email" id="email" name="email" class="form-control"
                         placeholder="البريد الاليكترونى" />
                 </div>
                 <div class="col-md-6">
                     <label class="form-label" for="password">كلمة المرور</label>
-                    <input type="text" id="password" name="password" class="form-control" placeholder="كلمة المرور" />
+                    <input type="password" id="password" name="password" class="form-control" placeholder="كلمة المرور" />
                 </div>
                 <div class="col-md-6 ">
                     <label class="form-label">الوظيفة :</label>
@@ -48,8 +48,8 @@
 
                     @foreach ($permissions as $permission)
                         <div class="col-2 form-check form-check-inline m-2">
-                            <input class="form-check-input" type="checkbox" id="permission{{ $permission->id }}"
-                                value="{{ $permission->id }}" />
+                            <input class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox"
+                                id="permission{{ $permission->id }}" value="{{ $permission->name }}" />
                             <label class="form-check-label"
                                 for="permission{{ $permission->id }}">{{ __('permissions.' . $permission->name) }}</label>
                         </div>
