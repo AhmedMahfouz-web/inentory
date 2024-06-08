@@ -24,6 +24,12 @@
                                 <div class="col-md-6 col-sm-5 col-12 mb-sm-0 mb-4">
                                     <h6 class="mb-4">الفرع :</h6>
 
+                                    <div class="col-sm-12 col-md-6">
+                                        <label for="flatpickr-date" class="form-label">التاريخ</label>
+                                        <input type="text" name="created_at" class="form-control flatpickr-date"
+                                            placeholder="YYYY-MM-DD" />
+                                    </div>
+
                                     <select form="create" class=" select2Basic select2 form-select form-select-lg"
                                         data-allow-clear="true" name="branch_id">
                                         @foreach ($branches as $branch)
@@ -98,6 +104,14 @@
     <script src="{{ asset('vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('vendor/libs/cleavejs/cleave-phone.js') }}"></script>
     <script src="{{ asset('vendor/libs/jquery-repeater/jquery-repeater.js') }}"></script>
+    <script src="{{ asset('vendor/libs/moment/moment.js') }}"></script>
+    <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
+    <script src="{{ asset('vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
+    <script src="{{ asset('vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
+    <script src="{{ asset('vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
+    <script src="{{ asset('vendor/libs/pickr/pickr.js') }}"></script>
+
+    <script src="{{ asset('js/forms-pickers.js') }}"></script>
 
     <script src="{{ asset('js/app-invoice-add.js') }}"></script>
 

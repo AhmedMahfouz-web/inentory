@@ -138,7 +138,14 @@ class ProductController extends Controller
                     'qty'
                 )->get();
         }
+        $date = date('Y-m');
+        $qty = $products->map(function ($product) use ($date) {
+            return [
+                'product' => $product,
+                'qty' => $product->qty($date),
+            ];
+        });
 
-        return view('pages.product.inventory', compact('products', 'start'));
+        return view('pages.product.inventory', compact('products', 'start', 'qty'));
     }
 }

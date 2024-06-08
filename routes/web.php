@@ -126,6 +126,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['prefix' => 'inventory', 'controller' => StartInventoryController::class], function ($router) {
         Route::get('/start', 'index')->name('start inventory');
         Route::post('/start', 'store')->name('store start_inventory');
+        Route::get('/qty_start', 'qty_store');
     });
 
     Route::group(['prefix' => 'sell', 'controller' => SellController::class], function ($router) {

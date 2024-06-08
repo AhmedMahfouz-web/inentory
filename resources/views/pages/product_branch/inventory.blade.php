@@ -92,7 +92,7 @@
                                 <tr>
                                     <td>{{ $product['product']['product']->code }}</td>
                                     <td>
-                                        {{ $product['product']['product']['category']->name }}
+                                        {{ $product['product']['product']['sub_category']->name }}
                                     </td>
                                     <td>
                                         {{ $product['product']['product']->name }}
