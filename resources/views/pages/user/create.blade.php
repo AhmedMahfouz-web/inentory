@@ -26,13 +26,9 @@
                     <input type="text" id="username" name="username" class="form-control" placeholder="اسم المستخدم" />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label" for="email">البريد الاليكترونى</label>
+                    <label class="form-label" for="email">البريد الالكترونى</label>
                     <input type="email" id="email" name="email" class="form-control"
-                        placeholder="البريد الاليكترونى" />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label" for="password">كلمة المرور</label>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="كلمة المرور" />
+                        placeholder="البريد الالكترونى" />
                 </div>
                 <div class="col-md-6 ">
                     <label class="form-label">الوظيفة :</label>
@@ -44,21 +40,19 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-12">
-
-                    @foreach ($permissions as $permission)
-                        <div class="col-2 form-check form-check-inline m-2">
-                            <input class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox"
-                                id="permission{{ $permission->id }}" value="{{ $permission->name }}" />
-                            <label class="form-check-label"
-                                for="permission{{ $permission->id }}">{{ __('permissions.' . $permission->name) }}</label>
-                        </div>
-                    @endforeach
+                <div class="col-md-6">
+                    <label class="form-label" for="password">كلمة المرور</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="كلمة المرور" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="password">تاكيد كلمة المرور</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                        placeholder="تاكيد كلمة المرور" />
                 </div>
             </div>
             <div class="mt-5">
                 <button type="submit" class="btn btn-primary me-sm-3 me-1">حفظ</button>
-                <a href="{{ route('show units') }}" class="btn btn-label-secondary">الغاء</a>
+                <a href="{{ route('show users') }}" class="btn btn-label-secondary">الغاء</a>
             </div>
     </div>
     </form>

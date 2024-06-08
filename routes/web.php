@@ -145,8 +145,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/', 'index')->name('show roles');
         Route::get('/create', 'create')->name('create role');
         Route::post('/store', 'store')->name('store role');
-        Route::get('/edit/{user}', 'edit')->name('edit role');
-        Route::post('/update/{user}', 'update')->name('update role');
+        Route::get('/edit/{role}', 'edit')->name('edit role');
+        Route::post('/update/{role}', 'update')->name('update role');
+    });
+
+    Route::group(['controller' => LoginController::class], function ($router) {
+        Route::post('/logout', 'logout')->name('logout');
     });
 });
 

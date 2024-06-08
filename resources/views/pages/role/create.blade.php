@@ -35,7 +35,7 @@
             </div>
             <div class="mt-5">
                 <button type="submit" class="btn btn-primary me-sm-3 me-1">حفظ</button>
-                <a href="{{ route('show units') }}" class="btn btn-label-secondary">الغاء</a>
+                <a href="{{ route('show roles') }}" class="btn btn-label-secondary">الغاء</a>
             </div>
     </div>
     </form>

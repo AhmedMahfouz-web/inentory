@@ -210,7 +210,9 @@
             new_record.classList.add('show');
         });
 
+        cancel_btn.addEventListener('click', hide);
         backdrop.addEventListener('click', hide);
+
         for (let i = 0; i < cancel_btn.length; i++) {
             cancel_btn[i].addEventListener('click', hide);
         }

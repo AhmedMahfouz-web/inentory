@@ -113,6 +113,14 @@
         let backdrop = document.getElementById('backdrop');
         let new_record = document.getElementById('add_new_record');
         let new_record_btn = document.getElementById('add_new_record_btn');
+        let close_btn = document.getElementById('close');
+
+        let close = function() {
+            new_record.classList.remove('show');
+            backdrop.classList.remove('offcanvas-backdrop');
+            backdrop.classList.remove('fade');
+            backdrop.classList.remove('show');
+        };
 
         new_record_btn.addEventListener('click', function() {
             backdrop.classList.add('offcanvas-backdrop');
@@ -122,12 +130,8 @@
             new_record.classList.add('show');
         });
 
-        backdrop.addEventListener('click', function() {
-            new_record.classList.remove('show');
-            backdrop.classList.remove('offcanvas-backdrop');
-            backdrop.classList.remove('fade');
-            backdrop.classList.remove('show');
-        });
+        backdrop.addEventListener('click', close);
+        close_btn.addEventListener('click', close);
 
         let search = document.getElementById("search_inout");
         search.addEventListener('keyup', search_on_table);

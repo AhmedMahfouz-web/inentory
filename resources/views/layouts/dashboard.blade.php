@@ -59,11 +59,13 @@
     <!-- Layout wrapper -->
 
     <div class="layout-container">
+
         <!-- Menu -->
         @include('includes.side')
         <!-- / Menu -->
 
         <!-- Layout container -->
+
         <div class="layout-page">
             <!-- Navbar -->
             @include('includes.header')

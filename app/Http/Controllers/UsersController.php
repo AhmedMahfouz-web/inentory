@@ -10,6 +10,13 @@ use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware(['permission:user-show|user-create|user-edit|user-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:user-create'], ['only' => ['create', 'store']]);
+        $this->middleware(['permission:user-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:user-delete'], ['only' => ['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -25,10 +32,9 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $permissions = Permission::all();
         $roles = Role::all();
 
-        return view('pages.user.create', compact('permissions', 'roles'));
+        return view('pages.user.create', compact('roles'));
     }
 
     /**
@@ -36,17 +42,13 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        // $user = User::create([
-        //     'name' => $request->name,
-        //     'username' => $request->username,
-        //     'email' => $request->email,
-        //     'password' => Hash::make($request->password),
-        // ]);
-        $user = User::find(11);
-        return $user->getPermissionNames();
-        foreach ($request->permissions as $permission) {
-            $user->givePermissionTo($permission);
-        };
+        $user = User::create([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+        $user->assignRole($request->role);
 
         return redirect()->route('home')->with('success', 'تم اضافة المستخدم بنجاح');
     }
@@ -64,7 +66,9 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        $roles = Role::all();
+
+        return view('pages.user.edit', compact('roles', 'user'));
     }
 
     /**
