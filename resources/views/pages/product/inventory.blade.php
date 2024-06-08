@@ -89,35 +89,43 @@
                         </thead>
                         <tbody>
                             @if (!empty($products))
-                                @foreach ($products as $index => $product)
+                                @foreach ($qty as $index => $product)
                                     <tr>
-                                        <td>{{ $product->code }}</td>
+                                        <td>{{ $product['product']->code }}</td>
                                         <td>
-                                            {{ $product->sub_category->name }}
+                                            {{ $product['product']['sub_category']->name }}
                                         </td>
                                         <td>
-                                            {{ $product->name }}
+                                            {{ $product['product']->name }}
                                         </td>
                                         <td>
-                                            {{ $product->unit->name }}
+                                            {{ $product['product']['unit']->name }}
                                         </td>
                                         <td>
-                                            {{ $product->price }}ج
+                                            {{ $product['product']->price }}ج
                                         </td>
                                         <td>
-                                            {{ empty($product->start[0]->qty) ? '' : $product->start[0]->qty }}
+                                            {{ empty($product['product']->start[0]->qty) ? '' : $product['product']->start[0]->qty }}
                                         </td>
                                         <td>
-                                            {{ $product->product_added_sum_qty }}
+                                            {{ $product['product']->product_added_sum_qty }}
                                         </td>
                                         <td>
-                                            {{ $product->sell_sum_qty }}
+                                            {{ $product['product']->sell_sum_qty }}
+                                        </td>
+                                        @php
+                                            if (empty($product->product_added_sum_qty)) {
+                                                $product_added = 0;
+                                            } else {
+                                                $product_added = $product->product_added_sum_qty;
+                                            }
+                                        @endphp
+                                        <td>
+                                            {{ empty($product['product']->start[0]->qty) ? $product['product']->product_added_sum_qty - $product['product']->sell_sum_qty : $product['product']->product_added_sum_qty + $product['product']->start[0]->qty - $product['product']->sell_sum_qty }}
+
                                         </td>
                                         <td>
-                                            {{ empty($product->start[0]->qty) ? $product->product_added_sum_qty - $product->sell_sum_qty : $product['product']->product_added_sum_qty + $product['product']->start[0]->qty - $product['product']->sell_sum_qty }}
-                                        </td>
-                                        <td>
-                                            {{ $product->stock }}
+                                            {{ $product['qty'] }}
                                         </td>
                                     </tr>
                                 @endforeach

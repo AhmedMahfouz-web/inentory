@@ -25,7 +25,7 @@ class ProductAddedController extends Controller
             $added_products = ProductAdded::whereDate('created_at', '>=', $start_date)
                 ->whereDate('created_at', '<=', $end_date)
                 ->with(['product' => function ($q) {
-                    $q->with(['category', 'unit']);
+                    $q->with(['sub_category', 'unit']);
                 }, 'branch'])->latest()->get();
             return view('pages.added_product.index', compact('added_products', 'start_date', 'end_date'));
         }
@@ -44,44 +44,48 @@ class ProductAddedController extends Controller
     public function store(Request $request)
     {
         $errors = [];
+        DB::beginTransaction();
         $order = Order::create([
             'branch_id' => $request->branch_id,
+            'created_at' => $request->created_at
         ]);
         $order_id = $order->id;
         foreach ($request->product as $product_added) {
             if (!empty($product_added['product_id'])) {
                 if ($product_added['product_id'] != null && $product_added['qty'] != null && $product_added['qty'] != 0) {
                     $product = Product::where('id', $product_added['product_id'])->first();
-                    if ($product->stock < $product_added['qty']) {
-                        $errors = "مخزون الـ" . $product->name . ' اقل من الكمية المنصرفة';
+                    // if ($product->stock < $product_added['qty']) {
+                    // $errors = "مخزون الـ" . $product->name . ' اقل من الكمية المنصرفة';
+                    // } else {
+                    $product_on_branch = Product_branch::where(['product_id' => $product_added['product_id'], 'branch_id' => $request['branch_id']])->first();
+                    if (!empty($product_on_branch)) {
+                        $product_on_branch->update(['price' => $product->price]);
+                        $product_on_branch->increment('qty', $product_added['qty']);
                     } else {
-                        DB::beginTransaction();
-                        $product_on_branch = Product_branch::where(['product_id' => $product_added['product_id'], 'branch_id' => $request['branch_id']])->first();
-                        if (!empty($product_on_branch)) {
-                            $product_on_branch->update(['price' => $product->price]);
-                            $product_on_branch->increment('qty', $product_added['qty']);
-                        } else {
-                            Product_branch::create([
-                                'product_id' => $product_added['product_id'],
-                                'branch_id' => $request->branch_id,
-                                'qty' => $product_added['qty'],
-                                'price' => $product->price,
-                            ]);
-                        }
-                        productAdded::create([
+                        Product_branch::create([
                             'product_id' => $product_added['product_id'],
-                            'price' => $product->price,
                             'branch_id' => $request->branch_id,
                             'qty' => $product_added['qty'],
-                            'order_id' => $order_id,
+                            'price' => $product->price,
+                            'created_at' => $request->created_at
                         ]);
-
-                        $product->decrement('stock', $product_added['qty']);
-                        DB::commit();
                     }
+                    productAdded::create([
+                        'product_id' => $product_added['product_id'],
+                        'price' => $product->price,
+                        'branch_id' => $request->branch_id,
+                        'qty' => $product_added['qty'],
+                        'order_id' => $order_id,
+                        'created_at' => $request->created_at
+                    ]);
+                    if ($product->stock > $product_added['qty']) {
+                        $product->decrement('stock', $product_added['qty']);
+                    }
+                    // }
                 }
             }
         }
+        DB::commit();
 
         return redirect()->route('exchanged product')->with(['success' => 'تم تحويل الاصناف بنجاح', 'error' => $errors]);
     }
