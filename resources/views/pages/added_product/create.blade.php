@@ -26,8 +26,8 @@
 
                                     <div class="col-sm-12 col-md-6">
                                         <label for="flatpickr-date" class="form-label">التاريخ</label>
-                                        <input type="text" name="created_at" class="form-control flatpickr-date"
-                                            placeholder="YYYY-MM-DD" />
+                                        <input type="text" name="created_at" form="create"
+                                            class="form-control flatpickr-date" placeholder="YYYY-MM-DD" />
                                     </div>
 
                                     <select form="create" class=" select2Basic select2 form-select form-select-lg"
