@@ -203,59 +203,74 @@
                 </li>
             </ul>
         </li>
-        <li class="menu-item {{ Request::is('unit/*', 'unit') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon ti ti-weight"></i>
-                <div data-i18n="الوحدات">الوحدات</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ Request::is('unit') ? 'active' : '' }}">
-                    <a href="{{ route('show units') }}" class="menu-link">
-                        <div data-i18n="عرض الوحدات">عرض الوحدات</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ Request::is('unit/create') ? 'active' : '' }}">
-                    <a href="{{ route('create unit') }}" class="menu-link">
-                        <div data-i18n="اضافة وحدة">اضافة وحدة</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-item {{ Request::is('users/*', 'users') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon ti ti-users"></i>
-                <div data-i18n="المستخدمين">المستخدمين</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ Request::is('users') ? 'active' : '' }}">
-                    <a href="{{ route('show users') }}" class="menu-link">
-                        <div data-i18n="عرض المستخدمين">عرض المستخدمين</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ Request::is('users/create') ? 'active' : '' }}">
-                    <a href="{{ route('create user') }}" class="menu-link">
-                        <div data-i18n="اضافة مستخدم">اضافة مستخدم</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-item {{ Request::is('roles/*', 'roles') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon ti ti-briefcase"></i>
-                <div data-i18n="الوظائف">الوظائف</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ Request::is('roles') ? 'active' : '' }}">
-                    <a href="{{ route('show roles') }}" class="menu-link">
-                        <div data-i18n="عرض الوظائف">عرض الوظائف</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ Request::is('roles/create') ? 'active' : '' }}">
-                    <a href="{{ route('create role') }}" class="menu-link">
-                        <div data-i18n="اضافة وظيفة">اضافة وظيفة</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
+
+        @can('unit-show')
+            <li class="menu-item {{ Request::is('unit/*', 'unit') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon ti ti-weight"></i>
+                    <div data-i18n="الوحدات">الوحدات</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ Request::is('unit') ? 'active' : '' }}">
+                        <a href="{{ route('show units') }}" class="menu-link">
+                            <div data-i18n="عرض الوحدات">عرض الوحدات</div>
+                        </a>
+                    </li>
+                    @can('unit-create')
+                        <li class="menu-item {{ Request::is('unit/create') ? 'active' : '' }}">
+                            <a href="{{ route('create unit') }}" class="menu-link">
+                                <div data-i18n="اضافة وحدة">اضافة وحدة</div>
+                            </a>
+                        </li>
+                    @endcan
+                </ul>
+            </li>
+        @endcan
+
+        @can('user-show')
+            <li class="menu-item {{ Request::is('users/*', 'users') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon ti ti-users"></i>
+                    <div data-i18n="المستخدمين">المستخدمين</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ Request::is('users') ? 'active' : '' }}">
+                        <a href="{{ route('show users') }}" class="menu-link">
+                            <div data-i18n="عرض المستخدمين">عرض المستخدمين</div>
+                        </a>
+                    </li>
+                    @can('user-edit')
+                        <li class="menu-item {{ Request::is('users/create') ? 'active' : '' }}">
+                            <a href="{{ route('create user') }}" class="menu-link">
+                                <div data-i18n="اضافة مستخدم">اضافة مستخدم</div>
+                            </a>
+                        </li>
+                    @endcan
+                </ul>
+            </li>
+        @endcan
+
+        @can('role-list')
+            <li class="menu-item {{ Request::is('roles/*', 'roles') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon ti ti-briefcase"></i>
+                    <div data-i18n="الوظائف">الوظائف</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ Request::is('roles') ? 'active' : '' }}">
+                        <a href="{{ route('show roles') }}" class="menu-link">
+                            <div data-i18n="عرض الوظائف">عرض الوظائف</div>
+                        </a>
+                    </li>
+                    @can('role-create')
+                        <li class="menu-item {{ Request::is('roles/create') ? 'active' : '' }}">
+                            <a href="{{ route('create role') }}" class="menu-link">
+                                <div data-i18n="اضافة وظيفة">اضافة وظيفة</div>
+                            </a>
+                        </li>
+                    @endcan
+                </ul>
+            </li>
+        @endcan
     </ul>
 </aside>
