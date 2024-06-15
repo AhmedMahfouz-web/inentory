@@ -56,6 +56,8 @@ class ProductAddedController extends Controller
                 if ($product_added['product_id']) {
                     if ($product_added['qty'] == null) {
                         $qty = 0;
+                    } else {
+                        $qty = $product_added['qty'];
                     }
                     $product = Product::where('id', $product_added['product_id'])->first();
                     // if ($product->stock < $product_added['qty']) {
