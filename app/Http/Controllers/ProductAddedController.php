@@ -52,7 +52,8 @@ class ProductAddedController extends Controller
         $order_id = $order->id;
         foreach ($request->product as $product_added) {
             if (!empty($product_added['product_id'])) {
-                if ($product_added['product_id'] != null && $product_added['qty'] != null && $product_added['qty'] != 0) {
+                // if ($product_added['product_id'] != null && $product_added['qty'] != null && $product_added['qty'] != 0) {
+                if ($product_added['product_id']) {
                     $product = Product::where('id', $product_added['product_id'])->first();
                     // if ($product->stock < $product_added['qty']) {
                     // $errors = "مخزون الـ" . $product->name . ' اقل من الكمية المنصرفة';
