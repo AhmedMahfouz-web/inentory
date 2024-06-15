@@ -80,7 +80,7 @@ class ProductAddedController extends Controller
                         'product_id' => $product_added['product_id'],
                         'price' => $product->price,
                         'branch_id' => $request->branch_id,
-                        'qty' => $product_added['qty'],
+                        'qty' => $qty,
                         'order_id' => $order_id,
                         'created_at' => $request->created_at
                     ]);
