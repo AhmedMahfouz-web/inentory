@@ -14,7 +14,8 @@ class ProductAdded extends Model
         'product_id',
         'qty',
         'price',
-        'order_id'
+        'order_id',
+        'created_at'
     ];
 
     public function product()
