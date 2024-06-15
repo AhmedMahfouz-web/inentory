@@ -54,6 +54,9 @@ class ProductAddedController extends Controller
             if (!empty($product_added['product_id'])) {
                 // if ($product_added['product_id'] != null && $product_added['qty'] != null && $product_added['qty'] != 0) {
                 if ($product_added['product_id']) {
+                    if ($product_added['qty'] == null) {
+                        $qty = 0;
+                    }
                     $product = Product::where('id', $product_added['product_id'])->first();
                     // if ($product->stock < $product_added['qty']) {
                     // $errors = "مخزون الـ" . $product->name . ' اقل من الكمية المنصرفة';
@@ -61,12 +64,12 @@ class ProductAddedController extends Controller
                     $product_on_branch = Product_branch::where(['product_id' => $product_added['product_id'], 'branch_id' => $request['branch_id']])->first();
                     if (!empty($product_on_branch)) {
                         $product_on_branch->update(['price' => $product->price]);
-                        $product_on_branch->increment('qty', $product_added['qty']);
+                        $product_on_branch->increment('qty', $qty);
                     } else {
                         Product_branch::create([
                             'product_id' => $product_added['product_id'],
                             'branch_id' => $request->branch_id,
-                            'qty' => $product_added['qty'],
+                            'qty' => $qty,
                             'price' => $product->price,
                             'created_at' => $request->created_at
                         ]);
