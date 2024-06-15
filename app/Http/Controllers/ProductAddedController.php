@@ -85,7 +85,7 @@ class ProductAddedController extends Controller
                         'created_at' => $request->created_at
                     ]);
                     if ($product->stock > $product_added['qty']) {
-                        $product->decrement('stock', $product_added['qty']);
+                        $product->decrement('stock', $qty);
                     }
                     // }
                 }
