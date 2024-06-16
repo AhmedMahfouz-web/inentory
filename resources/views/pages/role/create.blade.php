@@ -33,12 +33,11 @@
                     @endforeach
                 </div>
             </div>
-            <div class="mt-5">
+            <div class="mt-5 mb-3">
                 <button type="submit" class="btn btn-primary me-sm-3 me-1">حفظ</button>
                 <a href="{{ route('show roles') }}" class="btn btn-label-secondary">الغاء</a>
             </div>
-    </div>
-    </form>
+        </form>
     </div>
 @endsection
 
