@@ -95,7 +95,6 @@ class ProductAddedController extends Controller
 
         return redirect()->route('exchanged product')->with(['success' => 'تم تحويل الاصناف بنجاح', 'error' => $errors]);
     }
-
     public function store_branches(Request $request)
     {
         $errors = [];
