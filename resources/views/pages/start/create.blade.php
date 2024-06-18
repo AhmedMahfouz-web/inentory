@@ -13,8 +13,8 @@
 
                     <div class="col-2">
                         <input type="number" id="start"
-                            value="{{ empty($product->start[0]->qty) ? 0 : $product->start[0]->qty }}" name="start[]"
-                            class="form-control" placeholder="بداية المدة" />
+                            value="{{ empty($product->start[0]->qty) ? 0 : $product->start[0]->qty }}" step=".01"
+                            name="start[]" class="form-control" placeholder="بداية المدة" />
                         <input type="hidden" id="product_id" value="{{ $product->id }}" name="product_id[]"
                             class="form-control" />
                     </div>

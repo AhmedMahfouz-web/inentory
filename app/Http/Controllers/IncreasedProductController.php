@@ -52,7 +52,8 @@ class IncreasedProductController extends Controller
                     'product_id' => $increased_product['product_id'],
                     'price' => $increased_product['price'],
                     'supplier_id' => $increased_product['supplier_id'],
-                    'qty' => $increased_product['qty']
+                    'qty' => $increased_product['qty'],
+                    'created_at' => $request->created_at,
                 ]);
                 $product->increment('stock', $increased_product['qty']);
                 $product->update(['price' => $increased_product['price']]);

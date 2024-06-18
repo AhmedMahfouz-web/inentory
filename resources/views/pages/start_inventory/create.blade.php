@@ -15,7 +15,7 @@
                         <input type="number"
                             style="border-top: none; border-left: none; border-right: none; border-bottom:1px solid; border-radius: 0"
                             id="start" value="{{ empty($product->start[0]->qty) ? 0 : $product->start[0]->qty }}"
-                            name="start[]" class="form-control" placeholder="بداية المدة" />
+                            name="start[]" step=".01" class="form-control" placeholder="بداية المدة" />
                         <input type="hidden" id="product_id" value="{{ $product->id }}" name="product_id[]"
                             class="form-control" />
                     </div>

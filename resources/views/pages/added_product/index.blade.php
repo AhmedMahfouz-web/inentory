@@ -51,18 +51,29 @@
                     </div>
                     <form class="d-flex " action="{{ route('exchanged product date') }}" method="POST">
                         @csrf
-                        <div class="col-sm-6 col-md-3">
+                        <div class="col-sm-3 col-md-2">
                             <label for="flatpickr-date" class="form-label">البداية</label>
                             <input type="text" {{ !empty($start_date) ? 'value=' . $start_date : '' }} name="start_date"
                                 class="form-control flatpickr-date" placeholder="YYYY-MM-DD" />
                         </div>
-                        <div class="col-sm-6 col-md-3">
+                        <div class="col-sm-3 col-md-2">
                             <label for="flatpickr-date" class="form-label">النهاية</label>
                             <input type="text"{{ !empty($end_date) ? 'value=' . $end_date : '' }} name="end_date"
                                 class="form-control flatpickr-date" placeholder="YYYY-MM-DD" />
                         </div>
 
-                        <div class="col-sm-6 col-md-3">
+                        <div class="col-sm-3 col-md-2">
+                            <label for="branch_id" class="form-label">الفرع</label>
+                            <select class=" select2Basic select2 form-select form-select-lg" data-allow-clear="true"
+                                name="branch_id">
+                                <option value=""> </option>
+                                @foreach ($branches as $branch)
+                                    <option {{ $branch->id == $branch_id ? 'selected' : '' }} value="{{ $branch->id }}">
+                                        {{ $branch->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-sm-3 col-md-2">
                             <label class="form-label">بحث :</label>
                             <input type="search" class="form-control" id="search_input" placeholder=""
                                 aria-controls="DataTables_Table_0">

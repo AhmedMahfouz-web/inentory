@@ -22,6 +22,11 @@
                     <div class="card-body pe-3 px-3">
                         <h5 class="card-title">اضافة اصناف للمخزون</h5>
                         <form id="create"action="{{ route('increase product') }}" method="post">
+                            <div class="col-sm-12 col-md-6">
+                                <label for="flatpickr-date" class="form-label">التاريخ</label>
+                                <input type="text" name="created_at" form="create" class="form-control flatpickr-date"
+                                    placeholder="YYYY-MM-DD" />
+                            </div>
 
                             <div class="source-item p-0">
                                 @csrf
@@ -44,7 +49,7 @@
                                                 <div class="col-md-2 col-12 pe-0 mb-md-0 mb-3">
                                                     <p class="mb-2 repeater-title">الكمية</p>
                                                     <input type="number" class="form-control invoice-item-qty"
-                                                        placeholder="1" min="1" name="qty" />
+                                                        placeholder="1" step=".01" min="1" name="qty" />
                                                 </div>
                                                 <div class="col-md-2 col-12 pe-0 mb-md-0 mb-3">
                                                     <p class="mb-2 repeater-title">سعر الوحدة</p>
@@ -104,7 +109,14 @@
     <script src="{{ asset('vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('vendor/libs/cleavejs/cleave-phone.js') }}"></script>
     <script src="{{ asset('vendor/libs/jquery-repeater/jquery-repeater.js') }}"></script>
+    <script src="{{ asset('vendor/libs/moment/moment.js') }}"></script>
+    <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
+    <script src="{{ asset('vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
+    <script src="{{ asset('vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
+    <script src="{{ asset('vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
+    <script src="{{ asset('vendor/libs/pickr/pickr.js') }}"></script>
 
+    <script src="{{ asset('js/forms-pickers.js') }}"></script>
     <script src="{{ asset('js/app-invoice-add.js') }}"></script>
 
     {{-- <script src="{{ asset('js/tables-datatables-basic.js') }}"></script> --}}

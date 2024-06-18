@@ -14,7 +14,14 @@ class ProductAddedController extends Controller
 {
     public function index(Request $request)
     {
+        if (!empty($request->branch_id)) {
+            $branch_id = $request->branch_id;
+        } else {
+            $branch_id = null;
+        }
+        $branches = Branch::all();
         if (!empty($request->start_date)) {
+
             $start_date = $request->start_date;
             if (!empty($request->end_date)) {
                 $end_date = $request->end_date;
@@ -22,15 +29,41 @@ class ProductAddedController extends Controller
                 $end_date = date("Y-m-d");
             }
 
-            $added_products = ProductAdded::whereDate('created_at', '>=', $start_date)
-                ->whereDate('created_at', '<=', $end_date)
-                ->with(['product' => function ($q) {
-                    $q->with(['sub_category', 'unit']);
-                }, 'branch'])->latest()->get();
-            return view('pages.added_product.index', compact('added_products', 'start_date', 'end_date'));
-        }
+            if (!empty($request->branch_id)) {
+                $added_products = ProductAdded::whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date)
+                    ->where('branch_id', $request->branch_id)
+                    ->with(['product' => function ($q) {
+                        $q->with(['sub_category', 'unit']);
+                    }, 'branch'])->latest()->get();
+            } else {
+                $added_products = ProductAdded::whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date)
+                    ->with(['product' => function ($q) {
+                        $q->with(['sub_category', 'unit']);
+                    }, 'branch'])->latest()->get();
+            }
+            return view('pages.added_product.index', compact('added_products', 'start_date', 'end_date', 'branches', 'branch_id'));
+        } else {
+            $start_date = date("Y-m-d");
+            $end_date = date("Y-m-d");
 
-        return view('pages.added_product.index');
+            if (!empty($request->branch_id)) {
+                $added_products = ProductAdded::whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date)
+                    ->where('branch_id', $request->branch_id)
+                    ->with(['product' => function ($q) {
+                        $q->with(['sub_category', 'unit']);
+                    }, 'branch'])->latest()->get();
+            } else {
+                $added_products = ProductAdded::whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date)
+                    ->with(['product' => function ($q) {
+                        $q->with(['sub_category', 'unit']);
+                    }, 'branch'])->latest()->get();
+            }
+            return view('pages.added_product.index', compact('added_products', 'start_date', 'end_date', 'branches', 'branch_id'));
+        }
     }
 
     public function create()
@@ -150,9 +183,13 @@ class ProductAddedController extends Controller
         return redirect()->route('exchanged product')->with(['success' => 'تم تحويل الاصناف بنجاح', 'error' => $errors]);
     }
 
-    public function edit(productAdded $productAdded)
+    public function edit(Order $order)
     {
-        return view('pages.productAdded.edit', compact('productAdded'));
+        $order->load(['product_added', 'branch']);
+        $products = Product::orderBy('name', 'asc')->get();
+        $branches = Branch::all();
+
+        return view('pages.productAdded.edit', compact('products', 'branches'));
     }
 
     public function update(Request $request, productAdded $productAdded)

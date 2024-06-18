@@ -40,6 +40,7 @@ class StartController extends Controller
             } else {
                 $start_row->update([
                     'qty' => $start,
+                    'month' => date('Y-m') . '-01',
                 ]);
             }
             DB::commit();
