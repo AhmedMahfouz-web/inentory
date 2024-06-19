@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Order;
 use App\Models\Product;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -39,5 +40,14 @@ class OrderController extends Controller
     {
 
         return view('pages.order.edit', compact('order', 'branches'));
+    }
+
+    public function print(Order $order)
+    {
+        // Assuming you have data to pass
+        $order->load('branch', 'product_added');
+        $pdf = Pdf::loadView('print', compact('order'));
+
+        return $pdf->stream('document.pdf');
     }
 }

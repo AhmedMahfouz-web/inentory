@@ -94,6 +94,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/', 'index')->name('show order date');
         Route::post('/update/{$order}', 'update')->name('update order');
         Route::get('/edit/{order}', 'edit')->name('edit product_added');
+        Route::get('/print/{order}', 'print')->name('print');
     });
 
     Route::group(['prefix' => 'product_exchange', 'controller' => ProductAddedController::class], function ($router) {
