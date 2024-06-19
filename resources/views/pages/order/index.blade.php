@@ -77,6 +77,7 @@
                                 <th>التاريخ</th>
                                 <th>رقم الاذن</th>
                                 <th>الفرع</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -88,10 +89,12 @@
                                         <td>
                                             {{ $order->branch->name }}
                                         </td>
+                                        <td><a href="{{ route('print', $order->id) }}" class="btn btn-primary"><i
+                                                    class="ti ti-print mx-1"></i> طباعة</a></td>
                                     </tr>
                                 @endforeach
                             @endif
-                        </tbody>    
+                        </tbody>
                     </table>
                 </div>
             </div>

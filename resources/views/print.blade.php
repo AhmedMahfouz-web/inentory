@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="">
     <title>Printable Page</title>
     <style>
         @page {
@@ -56,11 +56,16 @@
 
     <div class="content">
         @foreach ($order->product_added as $product)
-            <div class="item">
-                <p>{{ $product->product->names }}</p>
-            </div>
-            <div class="page-break"></div>
+            <table class="bordered">
+                <th>
+                    <td>اسم الصنف</td>
+                </th>
+                <tr>
+                    <td>{{ $product->product->name }}</td>
+                </tr>
+            </table>
         @endforeach
+        <div class="page-break"></div>
     </div>
 </body>
 

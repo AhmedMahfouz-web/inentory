@@ -32,7 +32,9 @@ class OrderController extends Controller
     {
         $branches = Branch::all();
         $products = Product::all();
-        $order->load('branch', 'product_added');
+        $order->load(['branch', 'product_added' => function ($q) {
+            $q->with('product');
+        }]);
         return view('pages.order.edit', compact('order', 'branches', 'products'));
     }
 
@@ -45,7 +47,9 @@ class OrderController extends Controller
     public function print(Order $order)
     {
         // Assuming you have data to pass
-        $order->load('branch', 'product_added');
+        $order->load(['branch', 'product_added' => function ($q) {
+            $q->with('product');
+        }]);
         $pdf = Pdf::loadView('print', compact('order'));
 
         return $pdf->stream('document.pdf');
