@@ -48,10 +48,12 @@ class OrderController extends Controller
     {
         // Assuming you have data to pass
         $order->load(['branch', 'product_added' => function ($q) {
-            $q->with('product');
+            $q->with(['product' => function ($q) {
+                $q->with('unit');
+            }]);
         }]);
         $pdf = Pdf::loadView('print', compact('order'))->setPaper('a4');
 
-        return $pdf->stream('document.pdf');
+        return view('print', compact('order'));
     }
 }
