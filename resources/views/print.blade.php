@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <meta charset="">
+    <meta charset="UTF-8">
     <title>Printable Page</title>
     <style>
         @page {
@@ -13,7 +13,9 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'DejaVu Sans', sans-serif;
+            direction: rtl;
+            text-align: right;
         }
 
         .header,
@@ -58,7 +60,7 @@
         @foreach ($order->product_added as $product)
             <table class="bordered">
                 <th>
-                    <td>اسم الصنف</td>
+                <td>اسم الصنف</td>
                 </th>
                 <tr>
                     <td>{{ $product->product->name }}</td>

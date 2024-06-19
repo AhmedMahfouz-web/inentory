@@ -50,7 +50,7 @@ class OrderController extends Controller
         $order->load(['branch', 'product_added' => function ($q) {
             $q->with('product');
         }]);
-        $pdf = Pdf::loadView('print', compact('order'));
+        $pdf = Pdf::loadView('print', compact('order'))->setPaper('a4');
 
         return $pdf->stream('document.pdf');
     }
