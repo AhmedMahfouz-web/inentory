@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -29,7 +30,9 @@ class OrderController extends Controller
     public function edit(Request $request, Order $order)
     {
         $branches = Branch::all();
-        return view('pages.order.edit', compact('order', 'branches'));
+        $products = Product::all();
+        $order->load('branch', 'product_added');
+        return view('pages.order.edit', compact('order', 'branches', 'products'));
     }
 
     public function update(Request $request, Order $order)

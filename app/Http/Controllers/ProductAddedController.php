@@ -35,13 +35,13 @@ class ProductAddedController extends Controller
                     ->where('branch_id', $request->branch_id)
                     ->with(['product' => function ($q) {
                         $q->with(['sub_category', 'unit']);
-                    }, 'branch'])->latest()->get();
+                    }, 'branch', 'order'])->latest()->get();
             } else {
                 $added_products = ProductAdded::whereDate('created_at', '>=', $start_date)
                     ->whereDate('created_at', '<=', $end_date)
                     ->with(['product' => function ($q) {
                         $q->with(['sub_category', 'unit']);
-                    }, 'branch'])->latest()->get();
+                    }, 'branch', 'order'])->latest()->get();
             }
             return view('pages.added_product.index', compact('added_products', 'start_date', 'end_date', 'branches', 'branch_id'));
         } else {
@@ -54,13 +54,13 @@ class ProductAddedController extends Controller
                     ->where('branch_id', $request->branch_id)
                     ->with(['product' => function ($q) {
                         $q->with(['sub_category', 'unit']);
-                    }, 'branch'])->latest()->get();
+                    }, 'branch', 'order'])->latest()->get();
             } else {
                 $added_products = ProductAdded::whereDate('created_at', '>=', $start_date)
                     ->whereDate('created_at', '<=', $end_date)
                     ->with(['product' => function ($q) {
                         $q->with(['sub_category', 'unit']);
-                    }, 'branch'])->latest()->get();
+                    }, 'branch', 'order'])->latest()->get();
             }
             return view('pages.added_product.index', compact('added_products', 'start_date', 'end_date', 'branches', 'branch_id'));
         }

@@ -92,8 +92,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['prefix' => 'order', 'controller' => OrderController::class], function ($router) {
         Route::get('/', 'index')->name('show order');
         Route::post('/', 'index')->name('show order date');
-        Route::get('/edit/{$order}', 'edit')->name('edit order');
         Route::post('/update/{$order}', 'update')->name('update order');
+        Route::get('/edit/{order}', 'edit')->name('edit product_added');
     });
 
     Route::group(['prefix' => 'product_exchange', 'controller' => ProductAddedController::class], function ($router) {
@@ -101,7 +101,6 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/', 'index')->name('exchanged product date');
         Route::get('/create', 'create')->name('create exchange product');
         Route::post('/store', 'store')->name('exchange product');
-        Route::post('/edit/{order}', 'store')->name('edit product_added');
     });
 
     Route::group(['prefix' => 'product_increase', 'controller' => IncreasedProductController::class], function ($router) {

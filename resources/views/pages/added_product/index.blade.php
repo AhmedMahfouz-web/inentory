@@ -88,12 +88,14 @@
                             <tr>
                                 <th>التاريخ</th>
                                 <th>الكود</th>
+                                <th>رقم التحويل</th>
                                 <th>الفرع</th>
                                 <th>الاسم</th>
                                 <th>الوحدة</th>
                                 <th>الكمية</th>
                                 <th>السعر</th>
                                 <th>اجمالي السعر</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,6 +104,7 @@
                                     <tr>
                                         <td>{{ date('Y-m-d', strtotime($product->created_at)) }}</td>
                                         <td>{{ $product->product->code }}</td>
+                                        <td>{{ $product->order->id }}</td>
                                         <td>
                                             {{ $product->branch->name }}
                                         </td>
@@ -119,6 +122,9 @@
                                         </td>
                                         <td>
                                             {{ $product->price * $product->qty }}
+                                        </td>
+                                        <td><a href="{{ route('edit product_added', $product->order->id) }}"
+                                                class="btn btn-warning btn-sm p-2"><i class="ti ti-edit mx-1"></i> تعديل</a>
                                         </td>
                                     </tr>
                                 @endforeach
