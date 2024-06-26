@@ -40,8 +40,21 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
+        $order->load('product_added');
+        $order->update([
+            'branch_id' => $request->branch_id,
+            'updated_by' => auth()->user()->name,
+        ]);
+        foreach ($order->product_added as $index => $product_added) {
+            $product_added->update([
+                'product' => $request->product[$index]['product_id'],
+                'qty' => $request->product[$index]['qty'],
+                'branch_id' => $request->branch_id,
+                'updated_by' => auth()->user()->name,
+            ]);
+        }
 
-        return view('pages.order.edit', compact('order', 'branches'));
+        return redirect()->route('show order')->with('success', 'تم تعديل التحويل بنجاح');
     }
 
     public function print(Order $order)

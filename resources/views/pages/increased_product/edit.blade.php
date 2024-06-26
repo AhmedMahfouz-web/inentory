@@ -21,11 +21,12 @@
 
                     <div class="card-body pe-3 px-3">
                         <h5 class="card-title">اضافة اصناف للمخزون</h5>
-                        <form id="create"action="{{ route('increase product') }}" method="post">
+                        <form id="create"action="{{ route('update increase product', $product_increased->id) }}"
+                            method="post">
                             <div class="col-sm-12 col-md-6">
                                 <label for="flatpickr-date" class="form-label">التاريخ</label>
                                 <input type="text" name="created_at" form="create" class="form-control flatpickr-date"
-                                    value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" />
+                                    value="{{ $product_increased->created_at }}" placeholder="YYYY-MM-DD" />
                             </div>
 
                             <div class="source-item p-0">
@@ -39,8 +40,9 @@
                                                     <select class="select2 select2Basic form-select form-select-lg"
                                                         data-allow-clear="true" name="product_id">
                                                         @foreach ($products as $product)
-                                                            <option value="{{ $product->id }}">
-                                                                {{ $product->code . ' - ' . $product->name }}
+                                                            <option value="{{ $product->id }}"
+                                                                {{ $product_increased->product_id == $product->id ? 'selected' : '' }}>
+                                                                {{ $product->code . '  -  ' . $product->name }}
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -49,12 +51,14 @@
                                                 <div class="col-md-2 col-12 pe-0 mb-md-0 mb-3">
                                                     <p class="mb-2 repeater-title">الكمية</p>
                                                     <input type="number" class="form-control invoice-item-qty"
-                                                        placeholder="1" step="0.01" min="0.01" name="qty" />
+                                                        placeholder="1" step="0.01" min="0.01" name="qty"
+                                                        value="{{ $product_increased->qty }}" />
                                                 </div>
                                                 <div class="col-md-2 col-12 pe-0 mb-md-0 mb-3">
                                                     <p class="mb-2 repeater-title">سعر الوحدة</p>
                                                     <input type="decimal" class="form-control invoice-item-qty"
-                                                        placeholder="1.00" min="0.01" name="price" />
+                                                        placeholder="1.00" min="0.01" name="price"
+                                                        value="{{ $product_increased->price }}" />
                                                 </div>
 
                                                 <div class="col-md-3 col-12 mb-md-0 pe-0 mb-3">
@@ -62,7 +66,8 @@
                                                     <select class="select2 select2Basic form-select form-select-lg"
                                                         data-allow-clear="true" name="supplier_id">
                                                         @foreach ($suppliers as $supplier)
-                                                            <option value="{{ $supplier->id }}">
+                                                            <option value="{{ $supplier->id }}"
+                                                                {{ $product_increased->supplier_id == $supplier->id ? 'selected' : '' }}>
                                                                 {{ $supplier->name }}
                                                             </option>
                                                         @endforeach

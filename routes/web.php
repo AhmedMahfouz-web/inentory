@@ -92,7 +92,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['prefix' => 'order', 'controller' => OrderController::class], function ($router) {
         Route::get('/', 'index')->name('show order');
         Route::post('/', 'index')->name('show order date');
-        Route::post('/update/{$order}', 'update')->name('update order');
+        Route::post('/update/{order}', 'update')->name('update order');
         Route::get('/edit/{order}', 'edit')->name('edit product_added');
         Route::get('/print/{order}', 'print')->name('print');
     });
@@ -109,6 +109,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/', 'index')->name('increased product date');
         Route::get('/create', 'create')->name('create increase product');
         Route::post('/store', 'store')->name('increase product');
+        Route::get('/edit/{product_increased}', 'edit')->name('edit increase product');
+        Route::post('/update/{product_increased}', 'update')->name('update increase product');
     });
 
     Route::group(['prefix' => 'branch-inventory', 'controller' => ProductBranchController::class], function ($router) {

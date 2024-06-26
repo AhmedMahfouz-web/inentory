@@ -38,8 +38,8 @@
 
                             <div class="source-item pt-2">
                                 @csrf
-                                @foreach ($order->product_added as $product_added)
-                                    <div class="mb-3" data-repeater-list="product">
+                                <div class="mb-3" data-repeater-list="product">
+                                    @foreach ($order->product_added as $product_added)
                                         <div class="repeater-wrapper pt-0 pt-md-4" data-repeater-item>
                                             <div class="d-flex border rounded position-relative pe-0">
                                                 <div class="row w-100 p-3">
@@ -67,8 +67,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @endforeach
+                                    @endforeach
+                                </div>
 
                                 <div class="row pb-4">
                                     <div class="col-12">

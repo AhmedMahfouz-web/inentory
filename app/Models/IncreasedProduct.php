@@ -14,7 +14,7 @@ class IncreasedProduct extends Model
         'product_id',
         'qty',
         'price',
-        'created_at'
+        'created_at', 'created_by', 'updated_by'
     ];
 
     public function product()

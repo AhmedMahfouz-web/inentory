@@ -80,7 +80,8 @@ class ProductAddedController extends Controller
         DB::beginTransaction();
         $order = Order::create([
             'branch_id' => $request->branch_id,
-            'created_at' => $request->created_at
+            'created_at' => $request->created_at,
+            'created_by' => auth()->user()->name
         ]);
         $order_id = $order->id;
         foreach ($request->product as $product_added) {
@@ -106,7 +107,8 @@ class ProductAddedController extends Controller
                             'branch_id' => $request->branch_id,
                             'qty' => $qty,
                             'price' => $product->price,
-                            'created_at' => $request->created_at
+                            'created_at' => $request->created_at,
+                            'created_by' => auth()->user()->name
                         ]);
                     }
                     productAdded::create([
@@ -115,7 +117,8 @@ class ProductAddedController extends Controller
                         'branch_id' => $request->branch_id,
                         'qty' => $qty,
                         'order_id' => $order_id,
-                        'created_at' => $request->created_at
+                        'created_at' => $request->created_at,
+                        'created_by' => auth()->user()->name
                     ]);
                     if ($product->stock > $product_added['qty']) {
                         $product->decrement('stock', $qty);
@@ -125,6 +128,7 @@ class ProductAddedController extends Controller
             }
         }
         DB::commit();
+
 
         return redirect()->route('exchanged product')->with(['success' => 'تم تحويل الاصناف بنجاح', 'error' => $errors]);
     }

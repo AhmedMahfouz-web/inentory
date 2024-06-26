@@ -89,8 +89,11 @@
                                         <td>
                                             {{ $order->branch->name }}
                                         </td>
-                                        <td><a href="{{ route('print', $order->id) }}" class="btn btn-primary"><i
-                                                    class="ti ti-print mx-1"></i> طباعة</a></td>
+                                        <td><a href="{{ route('print', $order->id) }}" target="_blank"
+                                                class="btn btn-primary"><i class="ti ti-printer mx-1"></i> طباعة</a>
+                                            <a href="{{ route('edit product_added', $order->id) }}"
+                                                class="btn btn-warning "><i class="ti ti-edit mx-1"></i> تعديل</a>
+                                        </td>
                                     </tr>
                                 @endforeach
                             @endif

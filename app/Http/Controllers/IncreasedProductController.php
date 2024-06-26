@@ -28,8 +28,14 @@ class IncreasedProductController extends Controller
                 }, 'supplier'])->latest()->get();
             return view('pages.increased_product.index', compact('increased_products', 'start_date', 'end_date'));
         }
+        $increased_products = IncreasedProduct::whereDate('created_at', '>=', date("Y-m-d"))
+            ->whereDate('created_at', '<=', date("Y-m-d"))
+            ->with(['product' => function ($q) {
+                $q->with(['sub_category', 'unit']);
+            }, 'supplier'])->latest()->get();
 
-        return view('pages.increased_product.index');
+
+        return view('pages.increased_product.index', compact('increased_products'));
     }
 
     public function create()
@@ -44,8 +50,7 @@ class IncreasedProductController extends Controller
     {
 
         foreach ($request->product as $increased_product) {
-            if (!empty($increased_product) && $increased_product['product_id'] != null && $increased_product['qty'] != null && $increased_product['qty'] != 0) {
-                $product = Product::where('id', $increased_product['product_id'])->first();
+            if (!empty($increased_product)) {
                 DB::beginTransaction();
 
                 IncreasedProduct::create([
@@ -54,13 +59,49 @@ class IncreasedProductController extends Controller
                     'supplier_id' => $increased_product['supplier_id'],
                     'qty' => $increased_product['qty'],
                     'created_at' => $request->created_at,
+                    'created_by' => auth()->user()->name
                 ]);
+
+
+                $product = Product::findOrFail($increased_product['product_id']);
                 $product->increment('stock', $increased_product['qty']);
-                $product->update(['price' => $increased_product['price']]);
+
+                $date = explode('-', $request->created_at, 3)[0] . '-' . explode('-', $request->created_at, 3)[1] . '-01';
+                $price = calculateProductPrice($product, $increased_product, $date);
+
+
+                $product->update(['price' => $price]);
+
                 DB::commit();
             }
         }
 
         return redirect()->route('increased product')->with(['success' => 'تم اضافة الصنف بنجاح']);
+    }
+
+
+    public function edit(IncreasedProduct $product_increased)
+    {
+        $products = Product::orderBy('name', 'asc')->get();
+        $suppliers = Supplier::all();
+        $product_increased->load('product');
+
+        return view('pages.increased_product.edit', compact('products', 'suppliers', 'product_increased'));
+    }
+
+
+    public function update(Request $request, IncreasedProduct $product_increased)
+    {
+        return auth()->user()->name;
+        $product_increased->update([
+            'product_id' => $request->product[0]['product_id'],
+            'price' => $request->product[0]['price'],
+            'supplier_id' => $request->product[0]['supplier_id'],
+            'qty' => $request->product[0]['qty'],
+            'updated_by' => auth()->user()->name
+        ]);
+
+
+        return redirect()->route('increased product')->with(['success' => 'تم تعديل الصنف بنجاح']);
     }
 }

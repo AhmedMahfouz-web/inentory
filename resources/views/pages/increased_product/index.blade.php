@@ -53,8 +53,9 @@
                         @csrf
                         <div class="col-sm-6 col-md-3">
                             <label for="flatpickr-date" class="form-label">البداية</label>
-                            <input type="text" {{ !empty($start_date) ? 'value=' . $start_date : '' }} name="start_date"
-                                class="form-control flatpickr-date" placeholder="YYYY-MM-DD" />
+                            <input type="text"
+                                {{ !empty($start_date) ? 'value=' . $start_date : 'value=' . date('Y-m-d') }}
+                                name="start_date" class="form-control flatpickr-date" placeholder="YYYY-MM-DD" />
                         </div>
                         <div class="col-sm-6 col-md-3">
                             <label for="flatpickr-date" class="form-label">النهاية</label>
@@ -82,6 +83,9 @@
                                 <th>الكمية</th>
                                 <th>السعر</th>
                                 <th>الاجمالي</th>
+                                <th>اضافة</th>
+                                <th>تعديل</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -107,6 +111,16 @@
                                         </td>
                                         <td>
                                             {{ $product->price * $product->qty }}
+                                        </td>
+                                        <td>
+                                            {{ $product->created_by }}
+                                        </td>
+                                        <td>
+                                            {{ $product->updated_by }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('edit increase product', $product->id) }}"
+                                                class="btn btn-warning btn-sm p-2"><i class="ti ti-edit mx-1"></i> تعديل</a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -137,7 +151,7 @@
     <script src="{{ asset('vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script>
         let table = $("#data_table").DataTable({
-            "searching": false,
+            "searching": true,
             "language": {
                 "emptyTable": "اختر التاريخ اولا."
             },

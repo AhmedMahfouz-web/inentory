@@ -18,6 +18,10 @@
                 "HEXP" 0;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         @page {
             size: A4;
             margin: 20mm;
@@ -40,6 +44,7 @@
 
         .header {
             top: 0;
+            padding: 0
         }
 
         .footer {
@@ -75,6 +80,7 @@
             flex-direction: column;
             align-content: start;
             justify-content: start;
+            margin-bottom: 25px
         }
 
         .date p {
@@ -84,28 +90,45 @@
         }
 
         .content {
-            margin-top: 50mm;
+            /* margin-top: 61mm; */
             /* Adjust according to your header height */
             margin-bottom: 30mm;
             /* Adjust according to your footer height */
             page-break-before: auto;
+            width: 100%;
         }
 
 
         .divTable {
             display: table;
-            width: 99%;
-            border: 2px solid #202020;
-            font-size: 14px
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .content .divTable {
+            position: relative;
+            width: 99.9%;
+            top: 61mm;
+        }
+
+        .divTableRow:first-child {
+            border-top: 2px solid #202020;
+        }
+
+        .divTableRow:last-child {
+            border-bottom: 2px solid #202020;
         }
 
         .divTableRow {
-            display: table-row;
+            /* display: table-row; */
+            border-right: 2px solid #202020;
+            border-left: 2px solid #202020;
         }
 
         .divTableHeading {
             background-color: #EEE;
-            display: table-header-group;
+            /* display: table-header-group; */
+            width: 100%;
         }
 
         .divTableCell,
@@ -113,44 +136,53 @@
             text-align: center;
             border: 1px solid #202020;
             display: table-cell;
-            padding: 5px;
-            max-width: 20% !important;
-            width: 100px;
+            padding: 6px 5px;
+            box-sizing: border-box;
+            width: 80px;
+        }
+
+        .divTableHead:last-child,
+        .divTableCell:last-child {
+            width: 155px
         }
 
         .divTableHead:first-child,
         .divTableCell:first-child {
-            width: 15px !important;
+            max-width: 35px !important;
+            box-sizing: border-box;
+            width: 35px !important;
         }
 
         .divTableHead:nth-child(2),
         .divTableCell:nth-child(2) {
-            width: 250px !important;
+            max-width: 300px !important;
+            width: 290px !important;
+            box-sizing: border-box;
         }
 
         .divTableHead {
-            border: 2px solid #202020;
+            /* border: 2px solid #202020; */
         }
 
         .divTableHeading {
             background-color: #EEE;
-            display: table-header-group;
+            /* display: table-header-group; */
             font-weight: bold;
         }
 
         .divTableFoot {
             background-color: #EEE;
-            display: table-footer-group;
+            /* display: table-footer-group; */
             font-weight: bold;
         }
 
         .divTableBody {
-            display: table-row-group;
+            /* display: table-row-group; */
         }
 
         .page-break {
             page-break-after: always;
-            margin-bottom: 90mm
+            margin-bottom: 182mm
         }
     </style>
 </head>
@@ -161,6 +193,17 @@
         <div class="date">
             <p>التاريخ : {{ date('Y-m-d', strtotime($order->created_at)) }}</p>
             <p>الفرع : {{ $order->branch->name }}</p>
+        </div>
+        <div class="divTable">
+            <div class="divTableHeading">
+                <div class="divTableRow">
+                    <div class="divTableHead">م</div>
+                    <div class="divTableHead">اسم الصنف</div>
+                    <div class="divTableHead">الوحدة</div>
+                    <div class="divTableHead">الكمية</div>
+                    <div class="divTableHead">الملاحظات</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -216,16 +259,8 @@
                 @endforeach
             </tbody>
         </table> --}}
+
         <div class="divTable">
-            <div class="divTableHeading">
-                <div class="divTableRow">
-                    <div class="divTableHead">م</div>
-                    <div class="divTableHead">اسم الصنف</div>
-                    <div class="divTableHead">الوحدة</div>
-                    <div class="divTableHead">الكمية</div>
-                    <div class="divTableHead">الملاحظات</div>
-                </div>
-            </div>
             <div class="divTableBody">
                 @foreach ($order->product_added as $index => $product)
                     <div class="divTableRow">
@@ -235,14 +270,24 @@
                         <div class="divTableCell">{{ $product->qty }}</div>
                         <div class="divTableCell"></div>
                     </div>
-                    @if ($index > 20)
-                        <div class="page-break"></div>
-                    @endif
+                    @if ($index == 19 || $index == 39)
+            </div>
+        </div>
+        <div class="page-break"></div>
+        <div class="divTable">
+            <div class="divTableBody">
+                @endif
                 @endforeach
             </div>
         </div>
 
     </div>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
 </body>
 
 </html>

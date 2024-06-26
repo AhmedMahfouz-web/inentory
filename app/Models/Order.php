@@ -9,7 +9,7 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['branch_id', 'created_at'];
+    protected $fillable = ['branch_id', 'created_at', 'created_by', 'updated_by'];
 
     public function branch()
     {

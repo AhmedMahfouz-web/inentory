@@ -52,7 +52,7 @@
                         <tbody>
                             @foreach ($products as $product)
                                 <tr {{ $product->stock < $product->min_stock ? 'class=alert-danger' : '' }}>
-                                    <td>{{ $product->code }}</td>
+                                    <td>{{ $product->id }}</td>
                                     <td>
                                         <a href="{{ route('edit product', $product->id) }}">{{ $product->name }} </a>
                                     </td>
