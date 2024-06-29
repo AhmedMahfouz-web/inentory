@@ -21,12 +21,13 @@
                         </div>
                         <div class="dt-action-buttons text-end pt-3 pt-md-0">
                             <div class="dt-buttons btn-group flex-wrap">
-
-                                <button class="btn btn-secondary create-new btn-primary" tabindex="0"
-                                    aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
-                                    <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">اضافة
-                                            مستخدم جديدة</span></span>
-                                </button>
+                                @can('user-create')
+                                    <button class="btn btn-secondary create-new btn-primary" tabindex="0"
+                                        aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
+                                        <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">اضافة
+                                                مستخدم جديدة</span></span>
+                                    </button>
+                                @endcan
                             </div>
                         </div>
                     </div>
@@ -40,86 +41,100 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($users as $user)
+
+                        @can('user-edit')
+                            @foreach ($users as $user)
+                                <tr>
+                                    <td>{{ $user->id }}</td>
+                                    <td>
+                                        <a href="{{ route('edit user', $user->id) }}">{{ $user->name }} </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endcan
+
+                        @cannot('user-edit')
                             <tr>
                                 <td>{{ $user->id }}</td>
                                 <td>
-                                    <a href="{{ route('edit user', $user->id) }}">{{ $user->name }} </a>
+                                    {{ $user->name }}
                                 </td>
                             </tr>
-                        @endforeach
+                        @endcannot
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    <div class="offcanvas offcanvas-end" id="add_new_record">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="exampleModalLabel">اضافة مستخدم جديدة</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    @can('user-create')
+        <div class="offcanvas offcanvas-end" id="add_new_record">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title" id="exampleModalLabel">اضافة مستخدم جديدة</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body flex-grow-1">
+                <form class="add-new-record pt-0 row g-2" id="form-add-new-record" method="post"
+                    action="{{ route('store user') }}">
+                    @csrf
+                    <div class="col-sm-12">
+                        <label class="form-label" for="name">الاسم</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-user"></i></span>
+                            <input type="text" id="name" class="form-control dt-full-name" name="name"
+                                placeholder="الاسم" aria-label="الاسم" aria-describedby="الاسم" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <label class="form-label" for="username">اسم المستخدم</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-id"></i></span>
+                            <input type="text" id="username" class="form-control dt-full-name" name="username"
+                                placeholder="اسم المستخدم" aria-label="اسم المستخدم" aria-describedby="اسم المستخدم" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <label class="form-label" for="email">البريد الالكتروني</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-at"></i></span>
+                            <input type="text" id="email" class="form-control dt-full-name" name="email"
+                                placeholder="البريد الالكتروني" aria-label="البريد الالكتروني"
+                                aria-describedby="البريد الالكتروني" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12 mt-3">
+                        <label for="select2Basic" class="mb-2 text-light fw-semibold">الوظيفة</label>
+                        <select class="select2 form-select form-select" name="role" data-allow-clear="true">
+                            @foreach ($roles as $role)
+                                <option value="{{ $role->id }}">{{ $role->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-sm-12">
+                        <label class="form-label" for="password">كلمة المرور</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-brand-samsungpass"></i></span>
+                            <input type="text" id="password" class="form-control dt-full-name" name="password"
+                                placeholder="كلمة المرور" aria-label="كلمة المرور" aria-describedby="كلمة المرور" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <label class="form-label" for="confrim_password">تاكيد كلمة المرور</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-brand-samsungpass"></i></span>
+                            <input type="text" id="confirm_password" class="form-control dt-full-name"
+                                name="confirm_passwrod" placeholder="تاكيد كلمة المرور" aria-label="تاكيد كلمة المرور"
+                                aria-describedby="تاكيد كلمة المرور" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12 mt-5">
+                        <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">حفظ</button>
+                        <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">الغاء</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="offcanvas-body flex-grow-1">
-            <form class="add-new-record pt-0 row g-2" id="form-add-new-record" method="post"
-                action="{{ route('store user') }}">
-                @csrf
-                <div class="col-sm-12">
-                    <label class="form-label" for="name">الاسم</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basicFullname2" class="input-group-text"><i class="ti ti-user"></i></span>
-                        <input type="text" id="name" class="form-control dt-full-name" name="name"
-                            placeholder="الاسم" aria-label="الاسم" aria-describedby="الاسم" />
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <label class="form-label" for="username">اسم المستخدم</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basicFullname2" class="input-group-text"><i class="ti ti-id"></i></span>
-                        <input type="text" id="username" class="form-control dt-full-name" name="username"
-                            placeholder="اسم المستخدم" aria-label="اسم المستخدم" aria-describedby="اسم المستخدم" />
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <label class="form-label" for="email">البريد الالكتروني</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basicFullname2" class="input-group-text"><i class="ti ti-at"></i></span>
-                        <input type="text" id="email" class="form-control dt-full-name" name="email"
-                            placeholder="البريد الالكتروني" aria-label="البريد الالكتروني"
-                            aria-describedby="البريد الالكتروني" />
-                    </div>
-                </div>
-                <div class="col-sm-12 mt-3">
-                    <label for="select2Basic" class="mb-2 text-light fw-semibold">الوظيفة</label>
-                    <select class="select2 form-select form-select" name="role" data-allow-clear="true">
-                        @foreach ($roles as $role)
-                            <option value="{{ $role->id }}">{{ $role->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-sm-12">
-                    <label class="form-label" for="password">كلمة المرور</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basicFullname2" class="input-group-text"><i class="ti ti-brand-samsungpass"></i></span>
-                        <input type="text" id="password" class="form-control dt-full-name" name="password"
-                            placeholder="كلمة المرور" aria-label="كلمة المرور" aria-describedby="كلمة المرور" />
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <label class="form-label" for="confrim_password">تاكيد كلمة المرور</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basicFullname2" class="input-group-text"><i class="ti ti-brand-samsungpass"></i></span>
-                        <input type="text" id="confirm_password" class="form-control dt-full-name"
-                            name="confirm_passwrod" placeholder="تاكيد كلمة المرور" aria-label="تاكيد كلمة المرور"
-                            aria-describedby="تاكيد كلمة المرور" />
-                    </div>
-                </div>
-                <div class="col-sm-12 mt-5">
-                    <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">حفظ</button>
-                    <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">الغاء</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div id="backdrop"></div>
+        <div id="backdrop"></div>
+    @endcan
 @endsection
 
 @section('js')

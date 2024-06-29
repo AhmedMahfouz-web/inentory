@@ -31,11 +31,13 @@
                                             class="dt-down-arrow"></span>
                                     </button>
                                 </div>
-                                <button class="btn btn-secondary create-new btn-primary" tabindex="0"
-                                    aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
-                                    <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">اضافة
-                                            مورد جديد</span></span>
-                                </button>
+                                @can('supplier-create')
+                                    <button class="btn btn-secondary create-new btn-primary" tabindex="0"
+                                        aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
+                                        <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">اضافة
+                                                مورد جديد</span></span>
+                                    </button>
+                                @endcan
                             </div>
                         </div>
                     </div>
@@ -73,30 +75,59 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($suppliers as $supplier)
-                                <tr>
-                                    <td>{{ $supplier->id }}</td>
-                                    <td>
-                                        <a href="{{ route('edit supplier', $supplier->id) }}">{{ $supplier->name }} </a>
-                                    </td>
-                                    <td>{{ $supplier->phone }}</td>
-                                    <td>{{ $supplier->desc }}</td>
-                                    <td>{{ $supplier->address }}</td>
-                                    <td>{{ $supplier->segel_togary }}</td>
-                                    <td>{{ $supplier->betaqa_drebya }}</td>
-                                    <td>
-                                        @if ($supplier->has_delivery)
-                                            نعم
-                                        @else
-                                            @if (!$supplier->has_delivery)
-                                                لا
+                            @can('supplier-edit')
+                                @foreach ($suppliers as $supplier)
+                                    <tr>
+                                        <td>{{ $supplier->id }}</td>
+                                        <td>
+                                            <a href="{{ route('edit supplier', $supplier->id) }}">{{ $supplier->name }} </a>
+                                        </td>
+                                        <td>{{ $supplier->phone }}</td>
+                                        <td>{{ $supplier->desc }}</td>
+                                        <td>{{ $supplier->address }}</td>
+                                        <td>{{ $supplier->segel_togary }}</td>
+                                        <td>{{ $supplier->betaqa_drebya }}</td>
+                                        <td>
+                                            @if ($supplier->has_delivery)
+                                                نعم
                                             @else
-                                                <small class="text-light fw-semibold">لم يتم التحديد</small>
+                                                @if (!$supplier->has_delivery)
+                                                    لا
+                                                @else
+                                                    <small class="text-light fw-semibold">لم يتم التحديد</small>
+                                                @endif
                                             @endif
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endcan
+
+                            @cannot('supplier-edit')
+                                @foreach ($suppliers as $supplier)
+                                    <tr>
+                                        <td>{{ $supplier->id }}</td>
+                                        <td>
+                                            {{ $supplier->name }}
+                                        </td>
+                                        <td>{{ $supplier->phone }}</td>
+                                        <td>{{ $supplier->desc }}</td>
+                                        <td>{{ $supplier->address }}</td>
+                                        <td>{{ $supplier->segel_togary }}</td>
+                                        <td>{{ $supplier->betaqa_drebya }}</td>
+                                        <td>
+                                            @if ($supplier->has_delivery)
+                                                نعم
+                                            @else
+                                                @if (!$supplier->has_delivery)
+                                                    لا
+                                                @else
+                                                    <small class="text-light fw-semibold">لم يتم التحديد</small>
+                                                @endif
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endcannot
                         </tbody>
                     </table>
                 </div>
@@ -104,88 +135,90 @@
         </div>
     </div>
 
-    <div class="offcanvas offcanvas-end" id="add_new_record">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="exampleModalLabel">اضافة مورد جديد</h5>
-            <button type="button" class="btn-close cancel-btn text-reset" data-bs-dismiss="offcanvas"
-                aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body flex-grow-1">
+    @can('supplier-create')
+        <div class="offcanvas offcanvas-end" id="add_new_record">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title" id="exampleModalLabel">اضافة مورد جديد</h5>
+                <button type="button" class="btn-close cancel-btn text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body flex-grow-1">
 
-            <form class="card-body add-new-record pt-0 row g-2" id="form-add-new-record" method="post"
-                enctype="multipart/form-data" action="{{ route('store supplier') }}">
-                @csrf
-                <div class="col-sm-12">
-                    <label class="mb-2 text-light fw-semibold" for="name">اسم المورد</label>
-                    <input type="text" id="name" name="supplier_name" class="form-control mb-3"
-                        placeholder="اسم المورد" />
-                </div>
-                <div class="col-sm-12">
-                    <label class="mb-2 text-light fw-semibold" for="phone">الهاتف</label>
-                    <input type="text" id="phone" name="phone" class="form-control mb-3" placeholder="الهاتف" />
-                </div>
-                <div class="col-sm-12">
-                    <label class="mb-2 text-light fw-semibold" for="desc">الوصف</label>
-                    <textarea type="text" id="desc" name="desc" class="form-control mb-3" placeholder="الوصف"></textarea>
-                </div>
-                <div class="col-sm-12">
-                    <label class="mb-2 text-light fw-semibold" for="address">العنوان</label>
-                    <input type="text" id="address" name="address" class="form-control mb-3"
-                        placeholder="العنوان" />
-                </div>
-                <div class="col-sm-12">
-                    <label class="mb-2 text-light fw-semibold" for="segel_togary">رقم السجل التجاري</label>
-                    <input type="text" id="segel_togary" name="segel_togary" class="form-control mb-3"
-                        placeholder="السجل التجاري" />
-                </div>
-                <div class="col-12">
-                    <label for="file" class="text-light mb-2 fw-semibold">صورة السجل التجاري</label>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="fallback mb-3">
-                                <input name="segel_togary_image" type="file" />
+                <form class="card-body add-new-record pt-0 row g-2" id="form-add-new-record" method="post"
+                    enctype="multipart/form-data" action="{{ route('store supplier') }}">
+                    @csrf
+                    <div class="col-sm-12">
+                        <label class="mb-2 text-light fw-semibold" for="name">اسم المورد</label>
+                        <input type="text" id="name" name="supplier_name" class="form-control mb-3"
+                            placeholder="اسم المورد" />
+                    </div>
+                    <div class="col-sm-12">
+                        <label class="mb-2 text-light fw-semibold" for="phone">الهاتف</label>
+                        <input type="text" id="phone" name="phone" class="form-control mb-3" placeholder="الهاتف" />
+                    </div>
+                    <div class="col-sm-12">
+                        <label class="mb-2 text-light fw-semibold" for="desc">الوصف</label>
+                        <textarea type="text" id="desc" name="desc" class="form-control mb-3" placeholder="الوصف"></textarea>
+                    </div>
+                    <div class="col-sm-12">
+                        <label class="mb-2 text-light fw-semibold" for="address">العنوان</label>
+                        <input type="text" id="address" name="address" class="form-control mb-3"
+                            placeholder="العنوان" />
+                    </div>
+                    <div class="col-sm-12">
+                        <label class="mb-2 text-light fw-semibold" for="segel_togary">رقم السجل التجاري</label>
+                        <input type="text" id="segel_togary" name="segel_togary" class="form-control mb-3"
+                            placeholder="السجل التجاري" />
+                    </div>
+                    <div class="col-12">
+                        <label for="file" class="text-light mb-2 fw-semibold">صورة السجل التجاري</label>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="fallback mb-3">
+                                    <input name="segel_togary_image" type="file" />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-sm-12">
-                    <label class="mb-2 text-light fw-semibold" for="name">رقم البطاقة الضريبية</label>
-                    <input type="text" id="betaqa_drebya" name="betaqa_drebya" class="form-control"
-                        placeholder="رقم البطاقة الضريبية" />
-                </div>
-                <div class="col-sm-12">
-                    <label for="file" class="text-light mb-2 fw-semibold">صورة البطاقة الضريبة</label>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="fallback ">
-                                <input name="betaqa_drebya_image" type="file" />
+                    <div class="col-sm-12">
+                        <label class="mb-2 text-light fw-semibold" for="name">رقم البطاقة الضريبية</label>
+                        <input type="text" id="betaqa_drebya" name="betaqa_drebya" class="form-control"
+                            placeholder="رقم البطاقة الضريبية" />
+                    </div>
+                    <div class="col-sm-12">
+                        <label for="file" class="text-light mb-2 fw-semibold">صورة البطاقة الضريبة</label>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="fallback ">
+                                    <input name="betaqa_drebya_image" type="file" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-sm-12 p-4">
-                        <div class="text-light fw-semibold mb-2">التوصيل</div>
-                        <label class="switch switch-lg">
-                            <input type="checkbox" name="has_delivery" class="switch-input">
-                            <span class="switch-toggle-slider">
-                                <span class="switch-on">
-                                    <i class="ti ti-check"></i>
+                        <div class="col-sm-12 p-4">
+                            <div class="text-light fw-semibold mb-2">التوصيل</div>
+                            <label class="switch switch-lg">
+                                <input type="checkbox" name="has_delivery" class="switch-input">
+                                <span class="switch-toggle-slider">
+                                    <span class="switch-on">
+                                        <i class="ti ti-check"></i>
+                                    </span>
+                                    <span class="switch-off">
+                                        <i class="ti ti-x"></i>
+                                    </span>
                                 </span>
-                                <span class="switch-off">
-                                    <i class="ti ti-x"></i>
-                                </span>
-                            </span>
-                        </label>
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-12 mt-3 d-flex justify-content-md-end">
-                    <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">حفظ</button>
-                    <button type="reset" class="btn btn-outline-secondary cancel-btn"
-                        data-bs-dismiss="offcanvas">الغاء</button>
-                </div>
-            </form>
+                    <div class="col-sm-12 mt-3 d-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">حفظ</button>
+                        <button type="reset" class="btn btn-outline-secondary cancel-btn"
+                            data-bs-dismiss="offcanvas">الغاء</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    <div id="backdrop"></div>
+        <div id="backdrop"></div>
+    @endcan
 @endsection
 
 @section('js')

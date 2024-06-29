@@ -62,6 +62,16 @@ class DatabaseSeeder extends Seeder
     //     'product_branch-edit',
     //     'product_branch-delete',
     // ];
+    private $permissions = [
+        'order_show',
+        'order_print',
+        'order_edit',
+        'order_delete',
+        'sub_category_show',
+        'sub_category_create',
+        'sub_category_edit',
+        'sub_category_delete',
+    ];
     // /**
     //  * Seed the application's database.
     //  */
@@ -665,7 +675,7 @@ class DatabaseSeeder extends Seeder
     {
         foreach ($this->data as $product) {
             $item = Product::where('id', $product[0])->first();
-            $item->update('price', $product[1]);
+            $item->update(['price' => $product[1]]);
         }
     }
 }

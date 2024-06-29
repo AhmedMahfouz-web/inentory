@@ -63,10 +63,13 @@ class IncreasedProductController extends Controller
                 ]);
 
 
+
+                $date = explode('-', $request->created_at, 3)[0] . '-' . explode('-', $request->created_at, 3)[1];
+
                 $product = Product::findOrFail($increased_product['product_id']);
                 $product->increment('stock', $increased_product['qty']);
 
-                $date = explode('-', $request->created_at, 3)[0] . '-' . explode('-', $request->created_at, 3)[1] . '-01';
+
                 $price = calculateProductPrice($product, $increased_product, $date);
 
 

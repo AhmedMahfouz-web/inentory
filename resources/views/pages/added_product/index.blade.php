@@ -123,8 +123,11 @@
                                         <td>
                                             {{ $product->price * $product->qty }}
                                         </td>
-                                        <td><a href="{{ route('edit product_added', $product->order->id) }}"
-                                                class="btn btn-warning btn-sm p-2"><i class="ti ti-edit mx-1"></i> تعديل</a>
+                                        <td>
+                                            @can('product_added-edit')
+                                                <a href="{{ route('edit product_added', $product->order->id) }}"
+                                                    class="btn btn-warning btn-sm p-2"><i class="ti ti-edit mx-1"></i> تعديل</a>
+                                            @endcan
                                         </td>
                                     </tr>
                                 @endforeach

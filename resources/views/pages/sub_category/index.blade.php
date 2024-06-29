@@ -31,11 +31,13 @@
                                             class="dt-down-arrow"></span>
                                     </button>
                                 </div>
-                                <button class="btn btn-secondary create-new btn-primary" tabindex="0"
-                                    aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
-                                    <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">اضافة
-                                            تصنيف جديدة</span></span>
-                                </button>
+                                @can('sub_category_create')
+                                    <button class="btn btn-secondary create-new btn-primary" tabindex="0"
+                                        aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
+                                        <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">اضافة
+                                                تصنيف جديدة</span></span>
+                                    </button>
+                                @endcan
                             </div>
                         </div>
                     </div>
@@ -67,19 +69,37 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($categories as $category)
-                                <tr>
-                                    <td>
-                                        {{ $category->code }}
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('edit sub_category', $category->id) }}">{{ $category->name }} </a>
-                                    </td>
-                                    <td>
-                                        {{ $category->category->name }} </a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            @can('sub_category_edit')
+                                @foreach ($categories as $category)
+                                    <tr>
+                                        <td>
+                                            {{ $category->code }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('edit sub_category', $category->id) }}">{{ $category->name }} </a>
+                                        </td>
+                                        <td>
+                                            {{ $category->category->name }} </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endcan
+
+                            @cannot('sub_category_edit')
+                                @foreach ($categories as $category)
+                                    <tr>
+                                        <td>
+                                            {{ $category->code }}
+                                        </td>
+                                        <td>
+                                            {{ $category->name }}
+                                        </td>
+                                        <td>
+                                            {{ $category->category->name }} </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endcannot
                         </tbody>
                     </table>
                 </div>
@@ -87,47 +107,49 @@
         </div>
     </div>
 
-    <div class="offcanvas offcanvas-end" id="add_new_record">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="exampleModalLabel">اضافة قسم جديدة</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body flex-grow-1">
-            <form class="add-new-record pt-0 row g-2" id="form-add-new-record" method="post"
-                action="{{ route('store sub_category') }}">
-                @csrf
-                <div class="col-sm-12">
-                    <label class="form-label" for="basicFullname">اسم التصنيف</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basicFullname2" class="input-group-text"><i class="ti ti-category-2"></i></span>
-                        <input type="text" id="basicFullname" class="form-control dt-full-name" name="name"
-                            placeholder="اسم التصنيف" aria-label="اسم التصنيف" aria-describedby="اسم التصنيف" />
+    @can('sub_category_create')
+        <div class="offcanvas offcanvas-end" id="add_new_record">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title" id="exampleModalLabel">اضافة قسم جديدة</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body flex-grow-1">
+                <form class="add-new-record pt-0 row g-2" id="form-add-new-record" method="post"
+                    action="{{ route('store sub_category') }}">
+                    @csrf
+                    <div class="col-sm-12">
+                        <label class="form-label" for="basicFullname">اسم التصنيف</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-category-2"></i></span>
+                            <input type="text" id="basicFullname" class="form-control dt-full-name" name="name"
+                                placeholder="اسم التصنيف" aria-label="اسم التصنيف" aria-describedby="اسم التصنيف" />
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-12">
-                    <label class="form-label" for="basicFullname">كود التصنيف</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basicFullname2" class="input-group-text"><i class="ti ti-id"></i></span>
-                        <input type="text" id="basicFullname" class="form-control dt-full-name" name="code"
-                            placeholder="الكود" aria-label="الكود" aria-describedby="الكود" />
+                    <div class="col-sm-12">
+                        <label class="form-label" for="basicFullname">كود التصنيف</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-id"></i></span>
+                            <input type="text" id="basicFullname" class="form-control dt-full-name" name="code"
+                                placeholder="الكود" aria-label="الكود" aria-describedby="الكود" />
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-12 mt-3">
-                    <label for="select2Basic" class="mb-2 text-light fw-semibold">القسم</label>
-                    <select class="select2 form-select form-select" name="category" data-allow-clear="true">
-                        @foreach ($parent_category as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-sm-12 mt-5">
-                    <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">حفظ</button>
-                    <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">الغاء</button>
-                </div>
-            </form>
+                    <div class="col-sm-12 mt-3">
+                        <label for="select2Basic" class="mb-2 text-light fw-semibold">القسم</label>
+                        <select class="select2 form-select form-select" name="category" data-allow-clear="true">
+                            @foreach ($parent_category as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-sm-12 mt-5">
+                        <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">حفظ</button>
+                        <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">الغاء</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    <div id="backdrop"></div>
+        <div id="backdrop"></div>
+    @endcan
 @endsection
 
 @section('js')

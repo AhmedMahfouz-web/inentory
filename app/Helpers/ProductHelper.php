@@ -7,7 +7,7 @@ function calculateProductPrice($product, $increased_product, $date)
     $new_price = $increased_product['qty'] * $increased_product['price'];
     $total_qty = $increased_product['qty'] + $qty;
     $total_price = $old_price + $new_price;
-    $price = $total_qty / $total_price;
+    $price = $total_price / $total_qty;
 
     return $price;
 }

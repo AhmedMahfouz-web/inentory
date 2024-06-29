@@ -31,11 +31,13 @@
                                             class="dt-down-arrow"></span>
                                     </button>
                                 </div>
-                                <button class="btn btn-secondary create-new btn-primary" tabindex="0"
-                                    aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
-                                    <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">اضافة
-                                            قسم جديدة</span></span>
-                                </button>
+                                @can('category-create')
+                                    <button class="btn btn-secondary create-new btn-primary" tabindex="0"
+                                        aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
+                                        <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">اضافة
+                                                قسم جديدة</span></span>
+                                    </button>
+                                @endcan
                             </div>
                         </div>
                     </div>
@@ -66,16 +68,31 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($categories as $category)
-                                <tr>
-                                    <td>
-                                        {{ $category->code }}
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('edit category', $category->id) }}">{{ $category->name }} </a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            @can('category-edit')
+                                @foreach ($categories as $category)
+                                    <tr>
+                                        <td>
+                                            {{ $category->code }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('edit category', $category->id) }}">{{ $category->name }} </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endcan
+
+                            @cannot('category-edit')
+                                @foreach ($categories as $category)
+                                    <tr>
+                                        <td>
+                                            {{ $category->code }}
+                                        </td>
+                                        <td>
+                                            {{ $category->name }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endcannot
                         </tbody>
                     </table>
                 </div>
@@ -83,39 +100,41 @@
         </div>
     </div>
 
-    <div class="offcanvas offcanvas-end" id="add_new_record">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="exampleModalLabel">اضافة قسم جديدة</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body flex-grow-1">
-            <form class="add-new-record pt-0 row g-2" id="form-add-new-record" method="post"
-                action="{{ route('store category') }}">
-                @csrf
-                <div class="col-sm-12">
-                    <label class="form-label" for="basicFullname">اسم القسم</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basicFullname2" class="input-group-text"><i class="ti ti-category-2"></i></span>
-                        <input type="text" id="basicFullname" class="form-control dt-full-name" name="name"
-                            placeholder="اسم القسم" aria-label="اسم القسم" aria-describedby="اسم القسم" />
+    @can('category-create')
+        <div class="offcanvas offcanvas-end" id="add_new_record">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title" id="exampleModalLabel">اضافة قسم جديدة</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body flex-grow-1">
+                <form class="add-new-record pt-0 row g-2" id="form-add-new-record" method="post"
+                    action="{{ route('store category') }}">
+                    @csrf
+                    <div class="col-sm-12">
+                        <label class="form-label" for="basicFullname">اسم القسم</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-category-2"></i></span>
+                            <input type="text" id="basicFullname" class="form-control dt-full-name" name="name"
+                                placeholder="اسم القسم" aria-label="اسم القسم" aria-describedby="اسم القسم" />
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-12">
-                    <label class="form-label" for="basicFullname">كود القسم</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basicFullname2" class="input-group-text"><i class="ti ti-id"></i></span>
-                        <input type="text" id="basicFullname" class="form-control dt-full-name" name="code"
-                            placeholder="الكود" aria-label="الكود" aria-describedby="الكود" />
+                    <div class="col-sm-12">
+                        <label class="form-label" for="basicFullname">كود القسم</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-id"></i></span>
+                            <input type="text" id="basicFullname" class="form-control dt-full-name" name="code"
+                                placeholder="الكود" aria-label="الكود" aria-describedby="الكود" />
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-12 mt-5">
-                    <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">حفظ</button>
-                    <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">الغاء</button>
-                </div>
-            </form>
+                    <div class="col-sm-12 mt-5">
+                        <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">حفظ</button>
+                        <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">الغاء</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    <div id="backdrop"></div>
+        <div id="backdrop"></div>
+    @endcan
 @endsection
 
 @section('js')

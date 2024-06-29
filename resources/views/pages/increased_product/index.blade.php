@@ -118,10 +118,12 @@
                                         <td>
                                             {{ $product->updated_by }}
                                         </td>
-                                        <td>
-                                            <a href="{{ route('edit increase product', $product->id) }}"
-                                                class="btn btn-warning btn-sm p-2"><i class="ti ti-edit mx-1"></i> تعديل</a>
-                                        </td>
+                                        @can('product_increased-edit')
+                                            <td>
+                                                <a href="{{ route('edit increase product', $product->id) }}"
+                                                    class="btn btn-warning btn-sm p-2"><i class="ti ti-edit mx-1"></i> تعديل</a>
+                                            </td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                             @endif
