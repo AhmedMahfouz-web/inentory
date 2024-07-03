@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Product_branch;
 use App\Models\Sell;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -24,12 +25,13 @@ class SellController extends Controller
         foreach ($request->product as $index => $product) {
             if (!empty($product['product_id'])) {
                 DB::beginTransaction();
-                $product_branch = Product_branch::where('id', $product['product_id'])->first()->qty(date('Y-m'));
+                $product_branch = Product_branch::where('id', $product['product_id'])->first();
                 if ($product_branch >= $product['qty']) {
                     if ($product['qty'] != null) {
                         Sell::create([
                             'product_branch_id' => $product['product_id'],
                             'qty' => $product['qty'],
+                            'created_at' => Carbon::now()->subMonth()->startOfMonth(),
                         ]);
                     }
                 }

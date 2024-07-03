@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Sell extends Model
 {
     use HasFactory;
-    protected $fillable = ['product_branch_id', 'qty'];
+
+    protected $fillable = ['product_branch_id', 'qty', 'created_at'];
 }

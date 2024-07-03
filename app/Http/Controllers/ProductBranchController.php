@@ -21,8 +21,8 @@ class ProductBranchController extends Controller
                     }
                 ])->withSum(
                     [
-                        'product_added' => function ($q) use ($start, $end) {
-                            $q->whereBetween('created_at', [$start, $end]);
+                        'product_added' => function ($q) use ($start, $end, $branch_id) {
+                            $q->whereBetween('created_at', [$start, $end])->where('branch_id', $branch_id->id);
                         }
                     ],
                     'qty'

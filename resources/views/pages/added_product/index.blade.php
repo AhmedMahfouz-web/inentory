@@ -158,7 +158,7 @@
     <script src="{{ asset('vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script>
         let table = $("#data_table").DataTable({
-            "searching": false,
+            "searching": true,
             "language": {
                 "emptyTable": "اختر التاريخ اولا."
             },
