@@ -46,7 +46,7 @@
                                                 <div class="col-md-2 col-12 mb-md-0 mb-3">
                                                     <p class="mb-2 repeater-title">الكمية</p>
                                                     <input type="number" class="form-control invoice-item-qty"
-                                                        placeholder="1" min="1" max="" name="qty" />
+                                                        placeholder="1" min="0.00" step=".01" max="" name="qty" />
                                                 </div>
                                             </div>
                                         </div>
