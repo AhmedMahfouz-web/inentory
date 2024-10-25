@@ -49,7 +49,8 @@ class UsersController extends Controller
             'email' => $request->email,
             'password' => $request->password,
         ]);
-        $user->assignRole($request->role);
+
+        $user->assignRole([$request->role]);
 
         return redirect()->route('home')->with('success', 'تم اضافة المستخدم بنجاح');
     }

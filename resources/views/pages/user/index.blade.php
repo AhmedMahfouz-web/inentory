@@ -105,7 +105,7 @@
                         <label for="select2Basic" class="mb-2 text-light fw-semibold">الوظيفة</label>
                         <select class="select2 form-select form-select" name="role" data-allow-clear="true">
                             @foreach ($roles as $role)
-                                <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                <option value="{{ $role->name }}">{{ $role->name }}</option>
                             @endforeach
                         </select>
                     </div>

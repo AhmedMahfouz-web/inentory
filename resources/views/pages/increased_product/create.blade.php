@@ -48,8 +48,8 @@
                                                 </div>
                                                 <div class="col-md-2 col-12 pe-0 mb-md-0 mb-3">
                                                     <p class="mb-2 repeater-title">الكمية</p>
-                                                    <input type="number" class="form-control invoice-item-qty"
-                                                        placeholder="1" step="0.01" min="0.01" name="qty" />
+                                                    <input type="decimal" class="form-control invoice-item-qty"
+                                                        placeholder="1.00" step="0.01" min="0.01" name="qty" />
                                                 </div>
                                                 <div class="col-md-2 col-12 pe-0 mb-md-0 mb-3">
                                                     <p class="mb-2 repeater-title">سعر الوحدة</p>

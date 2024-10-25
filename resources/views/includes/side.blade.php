@@ -219,7 +219,7 @@
             </li>
         @endcan
 
-        @can('sub_category_show')
+        @can('sub_category-show')
             <li class="menu-item {{ Request::is('sub_category/*', 'sub_category') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon ti ti-category-2"></i>
@@ -231,7 +231,7 @@
                             <div data-i18n="عرض التصنيفات">عرض التصنيفات</div>
                         </a>
                     </li>
-                    @can('sub_category_create')
+                    @can('sub_category-create')
                         <li class="menu-item {{ Request::is('sub_category/create') ? 'active' : '' }}">
                             <a href="{{ route('create sub_category') }}" class="menu-link">
                                 <div data-i18n="اضافة تصنيف">اضافة تصنيف</div>

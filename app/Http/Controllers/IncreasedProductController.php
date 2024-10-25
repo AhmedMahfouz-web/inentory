@@ -49,9 +49,17 @@ class IncreasedProductController extends Controller
     public function store(Request $request)
     {
 
+        DB::beginTransaction();
         foreach ($request->product as $increased_product) {
-            if (!empty($increased_product)) {
-                DB::beginTransaction();
+            if (!empty($increased_product['product_id'])) {
+
+
+
+                $date = explode('-', $request->created_at, 3)[0] . '-' . explode('-', $request->created_at, 3)[1];
+
+                $product = Product::findOrFail($increased_product['product_id']);
+                $product->increment('stock', $increased_product['qty']);
+                $price = calculateProductPrice($product, $increased_product, $date);
 
                 IncreasedProduct::create([
                     'product_id' => $increased_product['product_id'],
@@ -64,21 +72,12 @@ class IncreasedProductController extends Controller
 
 
 
-                $date = explode('-', $request->created_at, 3)[0] . '-' . explode('-', $request->created_at, 3)[1];
-
-                $product = Product::findOrFail($increased_product['product_id']);
-                $product->increment('stock', $increased_product['qty']);
-
-
-                $price = calculateProductPrice($product, $increased_product, $date);
-
 
                 $product->update(['price' => $price]);
-
-                DB::commit();
             }
         }
 
+        DB::commit();
         return redirect()->route('increased product')->with(['success' => 'تم اضافة الصنف بنجاح']);
     }
 
@@ -95,7 +94,6 @@ class IncreasedProductController extends Controller
 
     public function update(Request $request, IncreasedProduct $product_increased)
     {
-        return auth()->user()->name;
         $product_increased->update([
             'product_id' => $request->product[0]['product_id'],
             'price' => $request->product[0]['price'],

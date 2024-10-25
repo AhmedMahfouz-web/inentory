@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Start_Inventory;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,12 +23,11 @@ class StartInventoryController extends Controller
     public function store(Request $request)
     {
         foreach ($request->start as $index => $start) {
-            DB::beginTransaction();
             if ($start == null) {
                 $start = 0;
             }
             $start_row = Start_Inventory::where('product_id', $request->product_id[$index])->where('month', date('Y-m') . '-01')->first();
-            if (empty($start_row)) {
+            if (empty($start_row)   ) {
                 Start_Inventory::create([
                     'product_id' => $request->product_id[$index],
                     'month' => date('Y-m') . '-01',
@@ -39,7 +39,6 @@ class StartInventoryController extends Controller
                     'month' => date('Y-m') . '-01',
                 ]);
             }
-            DB::commit();
         }
         return redirect()->route('product inventory')->with('success', 'تم تعديل بداية المدة بنجاح.');
     }

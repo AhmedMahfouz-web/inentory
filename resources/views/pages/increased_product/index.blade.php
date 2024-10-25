@@ -84,7 +84,9 @@
                                 <th>السعر</th>
                                 <th>الاجمالي</th>
                                 <th>اضافة</th>
-                                <th>تعديل</th>
+                                @can('product_increased-edit')
+                                    <th>تعديل</th>
+                                @endcan
                                 <th></th>
                             </tr>
                         </thead>

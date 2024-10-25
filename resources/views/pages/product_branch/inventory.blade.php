@@ -68,9 +68,11 @@
                         </div>
                     </form>
                     <div class="col-sm-8 col-md-4 d-flex mt-3">
-                        <a href="{{ route('start', $branch_id->id) }}" class="btn btn-primary btn-md flex-end m-2">تعديل
-                            البداية</a>
-                        <a href="{{ route('sell', $branch_id->id) }}" class="btn btn-primary btn-md flex-end m-2">صرف</a>
+                        @can('product_branch-edit')
+                            <a href="{{ route('start', $branch_id->id) }}" class="btn btn-primary btn-md flex-end m-2">تعديل
+                                البداية</a>
+                            <a href="{{ route('sell', $branch_id->id) }}" class="btn btn-primary btn-md flex-end m-2">صرف</a>
+                        @endcan
                     </div>
                     <table id="data_table" class="datatables-basic display table no-wrap table-hover">
                         <thead>
@@ -231,7 +233,7 @@
     <script src="{{ asset('vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script>
         let table = $("#data_table").DataTable({
-            "searching": false,
+            "searching": true,
             scrollX: true,
             "language": {
                 "emptyTable": "لم يضاف اي صنف الي هذا المخزن بعد"

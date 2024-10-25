@@ -33,10 +33,9 @@
                 <div class="col-md-6 ">
                     <label class="form-label">الوظيفة :</label>
 
-                    <select form="create" class=" select2Basic select2 form-select form-select-lg" data-allow-clear="true"
-                        name="role">
+                    <select class=" select2Basic select2 form-select form-select-lg" data-allow-clear="true" name="role">
                         @foreach ($roles as $role)
-                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                            <option value="{{ $role->name }}">{{ $role->name }}</option>
                         @endforeach
                     </select>
                 </div>

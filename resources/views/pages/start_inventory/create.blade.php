@@ -12,7 +12,7 @@
                         for="start">{{ $product->name }}</label>
 
                     <div class="col-1">
-                        <input type="number"
+                        <input type="decimal"
                             style="border-top: none; border-left: none; border-right: none; border-bottom:1px solid; border-radius: 0"
                             id="start" value="{{ empty($product->start[0]->qty) ? 0 : $product->start[0]->qty }}"
                             name="start[]" step=".01" class="form-control" placeholder="بداية المدة" />

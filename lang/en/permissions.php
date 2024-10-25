@@ -57,5 +57,10 @@ return [
     'product_branch-create' => 'اضافة اصناف الفروع',
     'product_branch-edit' => 'تعديل اصناف الفروع',
     'product_branch-delete' => 'حذف اصناف الفروع',
+    'order_show' => 'عرض التحويل',
+    'order_create' => 'اضافة تحويل',
+    'order_edit' => 'تعديل التحويل',
+    'order_print' => 'طباعة التحويل',
+    'order_delete' => 'حذف التحويل',
 
 ];

@@ -31,7 +31,7 @@
                                             class="dt-down-arrow"></span>
                                     </button>
                                 </div>
-                                @can('sub_category_create')
+                                @can('sub_category-create')
                                     <button class="btn btn-secondary create-new btn-primary" tabindex="0"
                                         aria-controls="DataTables_Table_0" id="add_new_record_btn" type="button">
                                         <span><i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">اضافة
@@ -69,7 +69,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @can('sub_category_edit')
+                            @can('sub_category-edit')
                                 @foreach ($categories as $category)
                                     <tr>
                                         <td>
@@ -85,7 +85,7 @@
                                 @endforeach
                             @endcan
 
-                            @cannot('sub_category_edit')
+                            @cannot('sub_category-edit')
                                 @foreach ($categories as $category)
                                     <tr>
                                         <td>
@@ -107,7 +107,7 @@
         </div>
     </div>
 
-    @can('sub_category_create')
+    @can('sub_category-create')
         <div class="offcanvas offcanvas-end" id="add_new_record">
             <div class="offcanvas-header border-bottom">
                 <h5 class="offcanvas-title" id="exampleModalLabel">اضافة قسم جديدة</h5>
