@@ -28,4 +28,21 @@ class Category extends Model
     {
         return $this->hasMany(SubCategory::class);
     }
+
+    public function soldProducts($date)
+    {
+        return $this->hasManyThrough(Sell::class, Product::class, 'category_id', 'product_id', 'id', 'id')
+            ->whereDate('created_at', '>=', $date . '-01')
+            ->whereDate('created_at', '<=', $date . '-31')
+            ->sum('qty');
+    }
+
+    public function soldProductsByCategory($date)
+    {
+        return $this->hasManyThrough(Sell::class, Product::class, 'category_id', 'product_id', 'id', 'id')
+                ->join('product_branches', 'sells.product_branch_id', '=', 'product_branches.id')
+                ->whereDate('sells.created_at', '>=', $date . '-01')
+                ->whereDate('sells.created_at', '<=', $date . '-31')
+                ->sum('sells.qty');
+    }
 }

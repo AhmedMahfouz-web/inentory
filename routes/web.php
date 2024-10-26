@@ -55,6 +55,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/update/{category}', 'update')->name('update category');
     });
 
+    Route::get('/categories/{id}/sold-products/{date}', [CategoryController::class, 'getSoldProductsByCategory'])->name('categories.soldProducts');
+
     Route::group(['prefix' => 'sub_category', 'controller' => SubCategoryController::class], function ($router) {
         Route::get('/', 'index')->name('show sub_categories');
         Route::get('/create', 'create')->name('create sub_category');

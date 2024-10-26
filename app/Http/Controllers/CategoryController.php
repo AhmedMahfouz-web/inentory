@@ -69,4 +69,29 @@ class CategoryController extends Controller
 
         return redirect()->route('show categories')->with(['success' => 'تم ازالة القسم بنجاح']);
     }
+
+    public function getSoldProductsByCategory($id, $date)
+    {
+        // Validate the date format (optional)
+        if (!\DateTime::createFromFormat('Y-m-d', $date)) {
+            return redirect()->back()->with('error', 'Invalid date format. Use YYYY-MM-DD.');
+        }
+
+        // Find the category by ID
+        $category = Category::find($id);
+
+        if (!$category) {
+            return redirect()->back()->with('error', 'Category not found.');
+        }
+
+        // Get sold products by category
+        $soldQuantity = $category->soldProductsByCategory($date);
+
+        // Pass the data to a Blade view
+        return view('pages.reports.sold_products', [
+            'category' => $category,
+            'date' => $date,
+            'sold_quantity' => $soldQuantity,
+        ]);
+    }
 }
