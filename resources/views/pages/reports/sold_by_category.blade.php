@@ -22,9 +22,9 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($salesData as $data)
+                @foreach ($categoriesSummary as $data)
                     <tr>
-                        <td>{{ $data['category_name'] }}</td>
+                        <td>{{ $data['name'] }}</td>
                         <td>{{ $data['total_sold'] }}</td>
                         <td>{{ number_format($data['total_price'], 2) }} ر.س</td>
                     </tr>
