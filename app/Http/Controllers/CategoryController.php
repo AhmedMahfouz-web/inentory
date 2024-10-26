@@ -109,7 +109,7 @@ class CategoryController extends Controller
             ];
         });
 
-        return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date'));
+        return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date', 'branch_id'));
         // $date = $request->input('date', now()->format('Y-m')); // Default to current month
         // $categories = Category::all();
 
