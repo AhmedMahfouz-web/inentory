@@ -94,4 +94,21 @@ class CategoryController extends Controller
             'sold_quantity' => $soldQuantity,
         ]);
     }
+
+    public function soldReport(Request $request)
+    {
+        $date = $request->input('date', now()->format('Y-m'));
+        $categories = Category::all();
+
+        $categoriesSummary = $categories->map(function ($category) use ($date) {
+            $summary = $category->soldProductsSummary($date);
+            return [
+                'name' => $category->name,
+                'total_sold' => $summary->total_sold ?? 0,
+                'total_price' => $summary->total_price ?? 0,
+            ];
+        });
+
+        return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date'));
+    }
 }
