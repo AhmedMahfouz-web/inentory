@@ -5,7 +5,7 @@
     <div class="col-12">
         <h1>تقرير المبيعات حسب الفئة</h1>
 
-        <form method="GET" action="{{ route('report sold by category') }}">
+        <form method="GET" action="{{ route('reports sold by category') }}">
             <label for="date">اختر التاريخ:</label>
             <input type="month" id="date" name="date" value="{{ $date }}">
             <button type="submit" class="btn btn-primary">عرض</button>
