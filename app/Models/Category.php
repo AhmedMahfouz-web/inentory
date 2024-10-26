@@ -39,10 +39,11 @@ class Category extends Model
 
     public function soldProductsByCategory($date)
     {
-        return $this->hasManyThrough(Sell::class, Product::class, 'category_id', 'product_id', 'id', 'id')
-                ->join('product_branches', 'sells.product_branch_id', '=', 'product_branches.id')
-                ->whereDate('sells.created_at', '>=', $date . '-01')
-                ->whereDate('sells.created_at', '<=', $date . '-31')
-                ->sum('sells.qty');
+        return Sell::join('product_branches', 'sells.product_branch_id', '=', 'product_branches.id')
+            ->join('products', 'product_branches.product_id', '=', 'products.id')
+            ->where('products.category_id', $this->id) // Filter by the current category
+            ->whereDate('sells.created_at', '>=', $date . '-01')
+            ->whereDate('sells.created_at', '<=', $date . '-31')
+            ->sum('sells.qty');
     }
 }
