@@ -47,11 +47,12 @@ class Category extends Model
             ->sum('sells.qty');
     }
 
-    public function soldProductsSummary($date)
+    public function soldProductsSummary($branch_id, $date)
     {
         return Sell::join('product_branches', 'sells.product_branch_id', '=', 'product_branches.id')
             ->join('products', 'product_branches.product_id', '=', 'products.id')
             ->where('products.category_id', $this->id) // Filter by the current category
+            ->where('product_branches.branch_id', $branch_id) // Filter by the specific branch
             ->whereDate('sells.created_at', '>=', $date . '-01')
             ->whereDate('sells.created_at', '<=', $date . '-31')
             ->selectRaw('SUM(sells.qty) as total_sold, SUM(sells.qty * product_branches.price) as total_price')
