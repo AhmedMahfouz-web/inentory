@@ -117,11 +117,11 @@ class CategoryController extends Controller
 
         $salesData = [];
         foreach ($categories as $category) {
-            $summary = $category->soldProductsSummary($date, $branch_id);
+            $categoriesSummary = $category->soldProductsSummary($date, $branch_id);
             $salesData[] = [
                 'category_name' => $category->name,
-                'total_sold' => $summary->total_sold ?? 0,
-                'total_price' => $summary->total_price ?? 0,
+                'total_sold' => $categoriesSummarysummary->total_sold ?? 0,
+                'total_price' => $categoriesSummarysummary->total_price ?? 0,
             ];
         }
 
