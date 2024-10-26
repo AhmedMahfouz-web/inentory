@@ -95,20 +95,21 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function soldReport(Request $request)
+    public function soldReport(Request $request, $branch_id)
     {
         $date = $request->input('date', now()->format('Y-m'));
         $categories = Category::all();
 
-        $categoriesSummary = $categories->map(function ($category) use ($date) {
-            $summary = $category->soldProductsSummary($date);
-            return [
-                'name' => $category->name,
+        $salesData = [];
+        foreach ($categories as $category) {
+            $summary = $category->soldProductsSummaryByBranch($date)->where('branch_id', $branch_id)->first();
+            $salesData[] = [
+                'category_name' => $category->name,
                 'total_sold' => $summary->total_sold ?? 0,
                 'total_price' => $summary->total_price ?? 0,
             ];
-        });
+        }
 
-        return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date'));
+        return view('branches.sales_report', compact('salesData', 'branch_id', 'date'));
     }
 }

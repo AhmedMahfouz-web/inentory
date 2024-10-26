@@ -56,7 +56,7 @@ Route::group(['middleware' => 'auth'], function () {
     });
 
     Route::get('/categories/{id}/sold-products/{date}', [CategoryController::class, 'getSoldProductsByCategory'])->name('categories.soldProducts');
-    Route::get('/sold-by-category', [CategoryController::class, 'soldReport'])->name('reports sold by category');
+    Route::get('/sold-by-category/{branch_id}', [CategoryController::class, 'soldReport'])->name('reports sold by category');
 
     Route::group(['prefix' => 'sub_category', 'controller' => SubCategoryController::class], function ($router) {
         Route::get('/', 'index')->name('show sub_categories');
