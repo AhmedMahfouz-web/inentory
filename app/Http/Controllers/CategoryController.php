@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -99,6 +100,7 @@ class CategoryController extends Controller
     {
         $date = $request->input('date', now()->format('Y-m'));
         $categories = Category::all();
+        $branch = Branch::find($branch_id);
 
         $categoriesSummary = $categories->map(function ($category) use ($date, $branch_id) {
             $summary = $category->soldProductsSummary($date, $branch_id);
@@ -109,7 +111,7 @@ class CategoryController extends Controller
             ];
         });
 
-        return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date', 'branch_id'));
+        return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date', 'branch'));
         // $date = $request->input('date', now()->format('Y-m')); // Default to current month
         // $categories = Category::all();
 
