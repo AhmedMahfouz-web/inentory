@@ -102,29 +102,29 @@ class CategoryController extends Controller
         $categories = Category::all();
         $branch = Branch::find($branch_id);
 
-        $categoriesSummary = $categories->map(function ($category) use ($date, $branch_id) {
-            $summary = $category->soldProductsSummary($date, $branch_id);
-            return [
-                'name' => $category->name,
-                'total_sold' => $summary->total_sold ?? 0,
-                'total_price' => $summary->total_price ?? 0,
-            ];
-        });
-
-        return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date', 'branch'));
-        // $date = $request->input('date', now()->format('Y-m')); // Default to current month
-        // $categories = Category::all();
-
-        // $salesData = [];
-        // foreach ($categories as $category) {
-        //     $summary = $category->soldProductsSummaryByBranch($date)->where('branch_id', $branch_id)->first();
-        //     $salesData[] = [
-        //         'category_name' => $category->name,
+        // $categoriesSummary = $categories->map(function ($category) use ($date, $branch_id) {
+        //     $summary = $category->soldProductsSummary($date, $branch_id);
+        //     return [
+        //         'name' => $category->name,
         //         'total_sold' => $summary->total_sold ?? 0,
         //         'total_price' => $summary->total_price ?? 0,
         //     ];
-        // }
+        // });
 
-        // return view('branches.sales_report', compact('salesData', 'branch_id', 'date'));
+        // return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date', 'branch'));
+        // $date = $request->input('date', now()->format('Y-m')); // Default to current month
+        // $categories = Category::all();
+
+        $salesData = [];
+        foreach ($categories as $category) {
+            $summary = $category->soldProductsSummary($date, $branch_id);
+            $salesData[] = [
+                'category_name' => $category->name,
+                'total_sold' => $summary->total_sold ?? 0,
+                'total_price' => $summary->total_price ?? 0,
+            ];
+        }
+
+        return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date', 'branch'));
     }
 }
