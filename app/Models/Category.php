@@ -56,6 +56,6 @@ class Category extends Model
             ->whereDate('sells.created_at', '>=', $date . '-01')
             ->whereDate('sells.created_at', '<=', $date . '-31')
             ->selectRaw('SUM(sells.qty) as total_sold, SUM(sells.qty * product_branches.price) as total_price')
-            ->first();
+            ->get();
     }
 }
