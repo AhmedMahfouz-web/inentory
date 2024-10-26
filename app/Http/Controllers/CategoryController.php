@@ -125,6 +125,6 @@ class CategoryController extends Controller
             ];
         }
 
-        return view('pages.reports.sold_by_category', compact('categoriesSummary', 'date', 'branch'));
+        return view('pages.reports.sold_by_category', compact('salesData', 'date', 'branch'));
     }
 }
