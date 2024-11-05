@@ -68,10 +68,17 @@ class ProductAddedController extends Controller
 
     public function create()
     {
+        $date = date('Y-m');
         $products = Product::orderBy('name', 'asc')->get();
+        $qty = $products->map(function ($product) use ($date) {
+            return [
+                'product' => $product,
+                'qty' => $product->qty($date),
+            ];
+        });
         $branches = Branch::all();
 
-        return view('pages.added_product.create', compact('products', 'branches'));
+        return view('pages.added_product.create', compact('products', 'branches', 'qty'));
     }
 
     public function store(Request $request)
