@@ -51,9 +51,10 @@
                                                     <p class="mb-2 repeater-title">الصنف</p>
                                                     <select class="select2 select2Basic form-select form-select-lg"
                                                         data-allow-clear="true" name="product_id">
-                                                        @foreach ($products as $product)
+                                                        @foreach ($products as $index => $product)
                                                             <option value="{{ $product->id }}">
-                                                                {{ $product->code . ' - ' . $product->name }}
+                                                                {{ $product->code . ' - ' . $product->name }} -
+                                                                {{ $qty[$index]->qty }}
                                                             </option>
                                                         @endforeach
                                                     </select>
