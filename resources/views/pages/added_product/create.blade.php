@@ -54,7 +54,7 @@
                                                         @foreach ($products as $index => $product)
                                                             <option value="{{ $product->id }}">
                                                                 {{ $product->code . ' - ' . $product->name }} -
-                                                                {{ $qty[$index]->qty }}
+                                                                (*{{ $qty[$index]['qty'] }}*)
                                                             </option>
                                                         @endforeach
                                                     </select>
