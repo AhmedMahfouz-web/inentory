@@ -9,6 +9,7 @@ use App\Services\ProductRequestService;
 use App\Http\Requests\ProductRequestRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ProductRequestController extends Controller
 {
@@ -59,8 +60,24 @@ class ProductRequestController extends Controller
      */
     public function create()
     {
-        // Get only branches the current user can make requests for
-        $branches = auth()->user()->requestableBranches()->get();
+        $user = auth()->user();
+        
+        // Debug: Check if user has any branch assignments
+        $userBranchesCount = \App\Models\UserBranch::where('user_id', $user->id)->count();
+        $requestableBranchesCount = \App\Models\UserBranch::where('user_id', $user->id)
+                                                          ->where('can_request', true)
+                                                          ->count();
+        
+        Log::info("User {$user->id} has {$userBranchesCount} total branch assignments");
+        Log::info("User {$user->id} has {$requestableBranchesCount} requestable branch assignments");
+        
+        // Get branches using direct query first to debug
+        $branches = \App\Models\Branch::whereHas('userBranches', function($query) use ($user) {
+            $query->where('user_id', $user->id)
+                  ->where('can_request', true);
+        })->get();
+        
+        Log::info("Found {$branches->count()} requestable branches for user {$user->id}");
         
         // If user has no assigned branches, show error
         if ($branches->isEmpty()) {

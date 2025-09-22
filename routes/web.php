@@ -224,6 +224,39 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/search/suggestions', [SearchController::class, 'getSearchSuggestions'])->name('api.search.suggestions');
     });
 
+    // Debug route to test user-branch assignments
+    Route::get('/debug/user-branches', function() {
+        $user = auth()->user();
+        $branches = \App\Models\Branch::all();
+        
+        // Assign first branch to current user if no assignments exist
+        $existingAssignments = \App\Models\UserBranch::where('user_id', $user->id)->count();
+        
+        if ($existingAssignments == 0 && $branches->isNotEmpty()) {
+            \App\Models\UserBranch::create([
+                'user_id' => $user->id,
+                'branch_id' => $branches->first()->id,
+                'can_request' => true,
+                'can_manage' => false,
+            ]);
+            
+            return "Assigned branch '{$branches->first()->name}' to user '{$user->name}'";
+        }
+        
+        $userBranches = \App\Models\UserBranch::where('user_id', $user->id)->with('branch')->get();
+        
+        return [
+            'user' => $user->name,
+            'assignments' => $userBranches->map(function($ub) {
+                return [
+                    'branch' => $ub->branch->name,
+                    'can_request' => $ub->can_request,
+                    'can_manage' => $ub->can_manage,
+                ];
+            })
+        ];
+    });
+
     Route::group(['controller' => LoginController::class], function ($router) {
         Route::post('/logout', 'logout')->name('logout');
     });
