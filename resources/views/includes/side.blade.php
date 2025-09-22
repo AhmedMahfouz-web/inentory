@@ -370,7 +370,7 @@
         @endcan
 
         <!-- User-Branch Management -->
-        @can('user-edit')
+        @can('user-branch-show')
             <li class="menu-item {{ Request::is('user-branches/*', 'user-branches') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon ti ti-users-group"></i>
@@ -382,6 +382,30 @@
                             <div data-i18n="إدارة الصلاحيات">إدارة الصلاحيات</div>
                         </a>
                     </li>
+                </ul>
+            </li>
+        @endcan
+
+        <!-- Product Requests -->
+        @can('product-request-show')
+            <li class="menu-item {{ Request::is('product-requests/*', 'product-requests') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon ti ti-file-text"></i>
+                    <div data-i18n="طلبات المنتجات">طلبات المنتجات</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ Request::is('product-requests') ? 'active' : '' }}">
+                        <a href="{{ route('product-requests.index') }}" class="menu-link">
+                            <div data-i18n="عرض الطلبات">عرض الطلبات</div>
+                        </a>
+                    </li>
+                    @can('product-request-create')
+                        <li class="menu-item {{ Request::is('product-requests/create') ? 'active' : '' }}">
+                            <a href="{{ route('product-requests.create') }}" class="menu-link">
+                                <div data-i18n="إنشاء طلب جديد">إنشاء طلب جديد</div>
+                            </a>
+                        </li>
+                    @endcan
                 </ul>
             </li>
         @endcan

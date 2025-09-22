@@ -57,6 +57,22 @@ return [
     'product_branch-create' => 'اضافة اصناف الفروع',
     'product_branch-edit' => 'تعديل اصناف الفروع',
     'product_branch-delete' => 'حذف اصناف الفروع',
+    
+    // Product Request Permissions
+    'product-request-show' => 'عرض طلبات المنتجات',
+    'product-request-create' => 'إنشاء طلبات المنتجات',
+    'product-request-edit' => 'تعديل طلبات المنتجات',
+    'product-request-delete' => 'حذف طلبات المنتجات',
+    'product-request-approve' => 'الموافقة على طلبات المنتجات',
+    'product-request-reject' => 'رفض طلبات المنتجات',
+    'product-request-fulfill' => 'تنفيذ طلبات المنتجات',
+    'product-request-cancel' => 'إلغاء طلبات المنتجات',
+    
+    // User-Branch Management Permissions
+    'user-branch-show' => 'عرض صلاحيات الفروع',
+    'user-branch-create' => 'إنشاء صلاحيات الفروع',
+    'user-branch-edit' => 'تعديل صلاحيات الفروع',
+    'user-branch-delete' => 'حذف صلاحيات الفروع',
     'order_show' => 'عرض التحويل',
     'order_create' => 'اضافة تحويل',
     'order_edit' => 'تعديل التحويل',

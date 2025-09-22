@@ -60,6 +60,12 @@ class ProductRequestController extends Controller
      */
     public function create()
     {
+        // Check if user has permission to create product requests
+        if (!auth()->user()->can('product-request-create')) {
+            return redirect()->route('product-requests.index')
+                           ->with('error', 'ليس لديك صلاحية لإنشاء طلبات المنتجات. يرجى التواصل مع المدير.');
+        }
+
         $user = auth()->user();
         
         // Debug: Check if user has any branch assignments
@@ -76,6 +82,12 @@ class ProductRequestController extends Controller
             $query->where('user_id', $user->id)
                   ->where('can_request', true);
         })->get();
+        
+        // If no branch assignments, get all branches for admin/manager roles
+        if ($branches->isEmpty() && ($user->hasRole('admin') || $user->hasRole('manager'))) {
+            $branches = \App\Models\Branch::all();
+            Log::info("User is admin/manager, showing all branches");
+        }
         
         Log::info("Found {$branches->count()} requestable branches for user {$user->id}");
         
