@@ -368,5 +368,22 @@
                 </ul>
             </li>
         @endcan
+
+        <!-- User-Branch Management -->
+        @can('user-edit')
+            <li class="menu-item {{ Request::is('user-branches/*', 'user-branches') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon ti ti-users-group"></i>
+                    <div data-i18n="صلاحيات الفروع">صلاحيات الفروع</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ Request::is('user-branches') ? 'active' : '' }}">
+                        <a href="{{ route('user-branches.index') }}" class="menu-link">
+                            <div data-i18n="إدارة الصلاحيات">إدارة الصلاحيات</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        @endcan
     </ul>
 </aside>

@@ -59,7 +59,15 @@ class ProductRequestController extends Controller
      */
     public function create()
     {
-        $branches = Branch::all();
+        // Get only branches the current user can make requests for
+        $branches = auth()->user()->requestableBranches()->get();
+        
+        // If user has no assigned branches, show error
+        if ($branches->isEmpty()) {
+            return redirect()->route('product-requests.index')
+                           ->with('error', 'لا يمكنك إنشاء طلبات منتجات. يرجى التواصل مع المدير لتعيين فروع لك.');
+        }
+        
         $products = Product::with(['sub_category', 'unit'])->active()->get();
 
         return view('product-requests.create', compact('branches', 'products'));
@@ -89,6 +97,13 @@ class ProductRequestController extends Controller
             'items.*.quantity.required' => 'يجب تحديد الكمية',
             'items.*.quantity.min' => 'الكمية يجب أن تكون أكبر من صفر'
         ]);
+
+        // Check if user can request for this branch
+        if (!auth()->user()->canRequestForBranch($request->branch_id)) {
+            return redirect()->back()
+                           ->withInput()
+                           ->with('error', 'ليس لديك صلاحية لإنشاء طلبات لهذا الفرع');
+        }
 
         $result = $this->productRequestService->createRequest(
             $request->branch_id,

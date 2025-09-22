@@ -49,4 +49,56 @@ class User extends Authenticatable
     {
         $this->attributes['password'] = bcrypt($password);
     }
+
+    /**
+     * Get the user's branch assignments
+     */
+    public function userBranches()
+    {
+        return $this->hasMany(UserBranch::class);
+    }
+
+    /**
+     * Get branches the user can make requests for
+     */
+    public function requestableBranches()
+    {
+        return $this->belongsToMany(Branch::class, 'user_branches')
+                    ->wherePivot('can_request', true)
+                    ->withPivot(['can_request', 'can_manage'])
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get branches the user can manage
+     */
+    public function manageableBranches()
+    {
+        return $this->belongsToMany(Branch::class, 'user_branches')
+                    ->wherePivot('can_manage', true)
+                    ->withPivot(['can_request', 'can_manage'])
+                    ->withTimestamps();
+    }
+
+    /**
+     * Check if user can make requests for a specific branch
+     */
+    public function canRequestForBranch($branchId)
+    {
+        return $this->userBranches()
+                    ->where('branch_id', $branchId)
+                    ->where('can_request', true)
+                    ->exists();
+    }
+
+    /**
+     * Check if user can manage a specific branch
+     */
+    public function canManageBranch($branchId)
+    {
+        return $this->userBranches()
+                    ->where('branch_id', $branchId)
+                    ->where('can_manage', true)
+                    ->exists();
+    }
 }

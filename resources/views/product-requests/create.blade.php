@@ -152,15 +152,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const addProductBtn = document.getElementById('add-product-btn');
     const productsContainer = document.getElementById('products-container');
-    const template = document.getElementById('product-row-template');
 
     console.log('Found elements:', {
         addProductBtn: !!addProductBtn,
-        productsContainer: !!productsContainer,
-        template: !!template
+        productsContainer: !!productsContainer
     });
 
-    if (!addProductBtn || !productsContainer || !template) {
+    if (!addProductBtn || !productsContainer) {
         console.error('Required elements not found');
         return;
     }
@@ -179,23 +177,57 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             console.log('Adding product row, index:', productIndex);
             
-            const templateContent = template.content.cloneNode(true);
+            // Create the HTML directly
+            const productRowHTML = `
+                <div class="product-row border rounded p-3 mb-3">
+                    <div class="row align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label">المنتج <span class="text-danger">*</span></label>
+                            <select name="items[${productIndex}][product_id]" class="form-select product-select" required>
+                                <option value="">اختر المنتج</option>
+                                @foreach($products as $product)
+                                    <option value="{{ $product->id }}" 
+                                            data-stock="{{ $product->stock }}" 
+                                            data-price="{{ $product->price }}"
+                                            data-unit="{{ $product->unit->name ?? '' }}">
+                                        {{ $product->name }} ({{ $product->code }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">الكمية <span class="text-danger">*</span></label>
+                            <input type="number" name="items[${productIndex}][quantity]" class="form-control quantity-input" 
+                                   min="0.01" step="0.01" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">المخزون المتاح</label>
+                            <input type="text" class="form-control stock-display" readonly placeholder="--">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">الوحدة</label>
+                            <input type="text" class="form-control unit-display" readonly placeholder="--">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-product-btn">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <label class="form-label">ملاحظات</label>
+                            <input type="text" name="items[${productIndex}][notes]" class="form-control" 
+                                   placeholder="ملاحظات خاصة بهذا المنتج...">
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            // Create a temporary div to work with the HTML
-            const tempDiv = document.createElement('div');
-            tempDiv.appendChild(templateContent);
+            // Add the HTML to the container
+            productsContainer.insertAdjacentHTML('beforeend', productRowHTML);
             
-            // Replace INDEX with actual index
-            tempDiv.innerHTML = tempDiv.innerHTML.replace(/INDEX/g, productIndex);
-            
-            console.log('Template HTML after replacement:', tempDiv.innerHTML);
-            
-            // Move the content to the container
-            while (tempDiv.firstChild) {
-                productsContainer.appendChild(tempDiv.firstChild);
-            }
-            
-            // Add event listeners to the new row
+            // Get the newly added row
             const newRow = productsContainer.lastElementChild;
             console.log('New row added:', newRow);
             

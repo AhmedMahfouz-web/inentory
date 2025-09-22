@@ -21,6 +21,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\UserBranchController;
 use App\Http\Controllers\UsersController;
 use App\Models\IncreasedProduct;
 use App\Models\Product_branch;
@@ -165,15 +166,27 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/update/{user}', 'update')->name('update user');
     });
 
-    Route::group(['prefix' => 'roles', 'controller' => RolesController::class], function ($router) {
+    Route::group(['controller' => RolesController::class, 'prefix' => 'roles'], function ($router) {
         Route::get('/', 'index')->name('show roles');
         Route::get('/create', 'create')->name('create role');
-        Route::post('/store', 'store')->name('store role');
-        Route::get('/edit/{role}', 'edit')->name('edit role');
-        Route::post('/update/{role}', 'update')->name('update role');
+        Route::post('/create', 'store')->name('store role');
+        Route::get('/{role}/edit', 'edit')->name('edit role');
+        Route::put('/{role}', 'update')->name('update role');
+        Route::delete('/{role}', 'destroy')->name('delete role');
     });
 
-    // Product Request Routes
+    // User-Branch Assignment Routes
+    Route::group(['controller' => UserBranchController::class, 'prefix' => 'user-branches'], function ($router) {
+        Route::get('/', 'index')->name('user-branches.index');
+        Route::get('/{user}/edit', 'edit')->name('user-branches.edit');
+        Route::put('/{user}', 'update')->name('user-branches.update');
+        
+        // API routes for AJAX operations
+        Route::post('/assign', 'assign')->name('user-branches.assign');
+        Route::delete('/unassign', 'unassign')->name('user-branches.unassign');
+        Route::get('/{user}/branches', 'getUserBranches')->name('user-branches.get-user-branches');
+    });
+
     Route::group(['prefix' => 'product-requests', 'controller' => ProductRequestController::class], function ($router) {
         // Branch routes
         Route::get('/', 'index')->name('product-requests.index');
