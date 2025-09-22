@@ -13,8 +13,87 @@ class SimplePermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create product request permissions
+        // Create ALL permissions (including existing ones)
         $permissions = [
+            // Role management
+            'role-list',
+            'role-create',
+            'role-edit',
+            'role-delete',
+            
+            // Product management
+            'product-show',
+            'product-create',
+            'product-edit',
+            'product-delete',
+            
+            // User management
+            'user-show',
+            'user-create',
+            'user-edit',
+            'user-delete',
+            
+            // Product added
+            'product_added-show',
+            'product_added-create',
+            'product_added-edit',
+            'product_added-delete',
+            
+            // Product increased
+            'product_increased-show',
+            'product_increased-create',
+            'product_increased-edit',
+            'product_increased-delete',
+            
+            // Unit management
+            'unit-show',
+            'unit-create',
+            'unit-edit',
+            'unit-delete',
+            
+            // Supplier management
+            'supplier-show',
+            'supplier-create',
+            'supplier-edit',
+            'supplier-delete',
+            
+            // Supplier category
+            'supplier_category-show',
+            'supplier_category-create',
+            'supplier_category-edit',
+            'supplier_category-delete',
+            
+            // Category management
+            'category-show',
+            'category-create',
+            'category-edit',
+            'category-delete',
+            
+            // Branch management
+            'branch-show',
+            'branch-create',
+            'branch-edit',
+            'branch-delete',
+            
+            // Product branch
+            'product_branch-show',
+            'product_branch-create',
+            'product_branch-edit',
+            'product_branch-delete',
+            
+            // Order management
+            'order_show',
+            'order_print',
+            'order_edit',
+            'order_delete',
+            
+            // Sub category
+            'sub_category_show',
+            'sub_category_create',
+            'sub_category_edit',
+            'sub_category_delete',
+            
+            // Product request permissions
             'product-request-show',
             'product-request-create',
             'product-request-edit',
@@ -23,6 +102,8 @@ class SimplePermissionsSeeder extends Seeder
             'product-request-reject',
             'product-request-fulfill',
             'product-request-cancel',
+            
+            // User-branch management
             'user-branch-show',
             'user-branch-create',
             'user-branch-edit',

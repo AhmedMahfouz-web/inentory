@@ -274,7 +274,13 @@ Route::group(['middleware' => 'auth'], function () {
             $adminRole = \Spatie\Permission\Models\Role::where('name', 'admin')->first();
             if ($adminRole) {
                 $user->assignRole('admin');
-                $message = "✅ Permissions created and admin role assigned to '{$user->name}'";
+                
+                // Get all permissions and assign to admin
+                $allPermissions = \Spatie\Permission\Models\Permission::all();
+                $adminRole->syncPermissions($allPermissions);
+                
+                $message = "✅ All {$allPermissions->count()} permissions created and assigned to admin role";
+                $message .= "<br>✅ Admin role assigned to '{$user->name}'";
             } else {
                 $message = "❌ Admin role not found after seeding";
             }
@@ -290,6 +296,13 @@ Route::group(['middleware' => 'auth'], function () {
                     'can_manage' => true,
                 ]);
                 $message .= "<br>✅ Branch '{$branches->first()->name}' assigned";
+            }
+            
+            // Show what permissions admin has
+            $adminPermissions = $adminRole->permissions->pluck('name')->toArray();
+            $message .= "<br><br>📋 Admin permissions include: " . implode(', ', array_slice($adminPermissions, 0, 10));
+            if (count($adminPermissions) > 10) {
+                $message .= " and " . (count($adminPermissions) - 10) . " more...";
             }
             
             return $message;
