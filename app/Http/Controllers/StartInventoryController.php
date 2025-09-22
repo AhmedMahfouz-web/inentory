@@ -44,15 +44,51 @@ class StartInventoryController extends Controller
     }
     public function qty_store()
     {
-        $products = Product::all();
-        foreach ($products as $product) {
-            $product_start = Start_Inventory::where('product_id', $product->id)->first();
-            if (!empty($product_start)) {
-                $product->update([
-                    'stock' => $product_start->qty,
-                ]);
+        try {
+            $products = Product::all();
+            $processed = 0;
+            
+            foreach ($products as $product) {
+                $product_start = Start_Inventory::where('product_id', $product->id)
+                    ->where('month', date('Y-m') . '-01')
+                    ->first();
+                    
+                if (!empty($product_start)) {
+                    $product->update([
+                        'stock' => $product_start->qty,
+                    ]);
+                    $processed++;
+                }
             }
+            
+            return redirect()->route('product inventory')->with('success', "تم تعديل بداية المدة بنجاح. تم معالجة {$processed} منتج.");
+            
+        } catch (\Exception $e) {
+            return redirect()->route('product inventory')->with('error', 'حدث خطأ أثناء تعديل بداية المدة: ' . $e->getMessage());
         }
-        return redirect()->route('product inventory')->with('success', 'تم تعديل بداية المدة بنجاح.');
+    }
+
+    /**
+     * Auto-generate main inventory starts using MySQL stored procedure
+     */
+    public function auto_generate()
+    {
+        try {
+            $targetMonth = date('Y-m') . '-01';
+            
+            // Call MySQL stored procedure for better performance
+            DB::statement('CALL GenerateMainInventoryStarts(?)', [$targetMonth]);
+            
+            // Get summary using MySQL function
+            $summary = DB::select('SELECT GetMonthlyInventorySummary(?) as summary', [$targetMonth]);
+            $summaryData = json_decode($summary[0]->summary, true);
+            
+            $mainCount = $summaryData['main_inventory']['count'] ?? 0;
+            
+            return redirect()->route('product inventory')->with('success', "تم إنشاء بداية المدة تلقائياً. تم معالجة {$mainCount} منتج.");
+            
+        } catch (\Exception $e) {
+            return redirect()->route('product inventory')->with('error', 'حدث خطأ أثناء إنشاء بداية المدة: ' . $e->getMessage());
+        }
     }
 }

@@ -10,4 +10,11 @@ class Start_Inventory extends Model
     use HasFactory;
 
     protected $fillable = ['product_id', 'month', 'qty'];
+
+    protected $dates = ['month'];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

@@ -50,26 +50,59 @@ class StartController extends Controller
 
     public function store_auto()
     {
+        try {
+            DB::beginTransaction();
 
-        // DB::beginTransaction();
+            $date = Carbon::now()->subMonth()->year . '-' . Carbon::now()->subMonth()->month;
+            $products = Product_branch::all();
+            $processed = 0;
+            
+            foreach ($products as $product) {
+                $qty = $product->qty($date, $product->branch_id);
+                
+                // Use updateOrCreate to avoid duplicates
+                Start::updateOrCreate(
+                    [
+                        'product_branch_id' => $product->id,
+                        'month' => date('Y-m') . '-01',
+                    ],
+                    ['qty' => $qty]
+                );
+                
+                $processed++;
+            }
+            
+            DB::commit();
 
-        $date = Carbon::now()->subMonth()->year . '-' . Carbon::now()->subMonth()->month;
-        $products = Product_branch::all();
-        $qty = $products->map(function ($product) use ($date) {
-            return [
-                'product' => $product,
-                'qty' => $product->qty($date, $product->branch_id),
-            ];
-        });
-        foreach ($qty as $product) {
-            Start::create([
-                'product_branch_id' => $product['product']->id,
-                'month' => date('Y-m') . '-01',
-                'qty' => $product['qty'],
-            ]);
+            return redirect()->route('home')->with('success', "تم تعديل بداية المدة بنجاح. تم معالجة {$processed} منتج.");
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->route('home')->with('error', 'حدث خطأ أثناء تعديل بداية المدة: ' . $e->getMessage());
         }
-        // DB::commit();
+    }
 
-        return redirect()->route('home')->with('success', 'تم تعديل بداية المدة بنجاح.');
+    /**
+     * Auto-generate starts using MySQL stored procedure (faster for large datasets)
+     */
+    public function store_auto_mysql()
+    {
+        try {
+            $targetMonth = date('Y-m') . '-01';
+            
+            // Call MySQL stored procedure for better performance
+            DB::statement('CALL GenerateBranchInventoryStarts(?)', [$targetMonth]);
+            
+            // Get summary using MySQL function
+            $summary = DB::select('SELECT GetMonthlyInventorySummary(?) as summary', [$targetMonth]);
+            $summaryData = json_decode($summary[0]->summary, true);
+            
+            $branchCount = $summaryData['branch_inventory']['count'] ?? 0;
+            
+            return redirect()->route('home')->with('success', "تم تعديل بداية المدة بنجاح باستخدام MySQL. تم معالجة {$branchCount} منتج.");
+            
+        } catch (\Exception $e) {
+            return redirect()->route('home')->with('error', 'حدث خطأ أثناء تعديل بداية المدة: ' . $e->getMessage());
+        }
     }
 }

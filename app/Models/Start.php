@@ -10,4 +10,11 @@ class Start extends Model
     use HasFactory;
 
     protected $fillable = ['product_branch_id', 'month', 'qty'];
+
+    protected $dates = ['month'];
+
+    public function product_branch()
+    {
+        return $this->belongsTo(Product_branch::class);
+    }
 }

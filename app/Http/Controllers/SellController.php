@@ -40,4 +40,17 @@ class SellController extends Controller
         }
         return redirect()->route('inventory', $branch_id)->with('success', 'تم صرف الاصناف بنجاح.');
     }
+
+    public function salesReport(Branch $branch_id)
+    {
+        $salesData = Sell::whereHas('product_branch', function ($query) use ($branch_id) {
+            $query->where('branch_id', $branch_id->id);
+        })
+        ->select(DB::raw('DATE(created_at) as date, SUM(qty) as total_qty'))
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get();
+
+        return view('pages.reports.sold_products', compact('salesData'));
+    }
 }

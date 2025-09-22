@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class BranchController extends Controller
 {
+    private function validateRequest(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string'
+        ]);
+    }
 
     public function index()
     {
@@ -22,9 +28,7 @@ class BranchController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string'
-        ]);
+        $this->validateRequest($request);
 
         $branch = Branch::create([
             'name' => $request->name
@@ -40,9 +44,7 @@ class BranchController extends Controller
 
     public function update(Request $request, Branch $branch)
     {
-        $request->validate([
-            'name' => 'required|string'
-        ]);
+        $this->validateRequest($request);
 
         $branch->update([
             'name' => $request->name
@@ -53,7 +55,6 @@ class BranchController extends Controller
 
     public function destroy(Branch $branch)
     {
-
         $branch->delete();
 
         return redirect()->route('show branches')->with(['success' => 'تم ازالة المخزن الفرعي بنجاح']);

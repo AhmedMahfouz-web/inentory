@@ -65,6 +65,32 @@
             </li>
         @endcan
 
+        <!-- Product Requests -->
+        <li class="menu-item {{ Request::is('product-requests/*', 'product-requests') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons ti ti-file-text"></i>
+                <div data-i18n="طلبات المنتجات">طلبات المنتجات</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ Request::is('product-requests') ? 'active' : '' }}">
+                    <a href="{{ route('product-requests.index') }}" class="menu-link">
+                        <div data-i18n="عرض الطلبات">عرض الطلبات</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('product-requests/create') ? 'active' : '' }}">
+                    <a href="{{ route('product-requests.create') }}" class="menu-link">
+                        <div data-i18n="طلب جديد">طلب جديد</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ Request::is('product-requests/warehouse/dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('product-requests.warehouse-dashboard') }}" class="menu-link">
+                        <div data-i18n="لوحة أمين المخزن">لوحة أمين المخزن</div>
+                        <span class="badge badge-center rounded-pill bg-danger ms-auto" id="pending-requests-badge" style="display: none;">0</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         @can('product_increased-show')
             <li class="menu-item {{ Request::is('product_increase/*', 'product_increase') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -115,6 +141,38 @@
                         </li>
                     @endforeach
 
+                </ul>
+            </li>
+
+            <!-- Monthly Starts -->
+            <li class="menu-item {{ Request::is('monthly-starts/*', 'monthly-starts') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons ti ti-calendar-stats"></i>
+                    <div data-i18n="بداية الشهر">بداية الشهر</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ Request::is('monthly-starts') ? 'active' : '' }}">
+                        <a href="{{ route('monthly starts') }}" class="menu-link">
+                            <div data-i18n="لوحة التحكم">لوحة التحكم</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ Request::is('monthly-starts/report') ? 'active' : '' }}">
+                        <a href="{{ route('monthly starts report') }}" class="menu-link">
+                            <div data-i18n="تقرير شامل">تقرير شامل</div>
+                        </a>
+                    </li>
+                    @foreach ($branches as $branch)
+                        <li class="menu-item {{ Request::is('start/' . $branch->id) ? 'active' : '' }}">
+                            <a href="{{ route('start', $branch->id) }}" class="menu-link">
+                                <div data-i18n="بداية {{ $branch->name }}">بداية {{ $branch->name }}</div>
+                            </a>
+                        </li>
+                    @endforeach
+                    <li class="menu-item {{ Request::is('inventory/start') ? 'active' : '' }}">
+                        <a href="{{ route('start inventory') }}" class="menu-link">
+                            <div data-i18n="بداية المخزن الرئيسي">بداية المخزن الرئيسي</div>
+                        </a>
+                    </li>
                 </ul>
             </li>
         @endcan

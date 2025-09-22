@@ -11,6 +11,7 @@
     <title>مخزن ماكسيم</title>
 
     <meta name="description" content="" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('img/favicon/favicon.ico') }}" />
@@ -118,6 +119,36 @@
     <script src="{{ asset('vendor/libs/toastr/toastr.js') }}"></script>
 
     <script src="{{ asset('js/main.js') }}"></script>
+    
+    <!-- Global Product Requests Script -->
+    <script>
+    // Update pending requests badge
+    function updatePendingRequestsBadge() {
+        fetch('{{ route("product-requests.api.pending-count") }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const badge = document.getElementById('pending-requests-badge');
+                    if (badge) {
+                        if (data.pending_count > 0) {
+                            badge.textContent = data.pending_count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                }
+            })
+            .catch(error => console.error('Error updating pending requests badge:', error));
+    }
+
+    // Update badge on page load and every 60 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePendingRequestsBadge();
+        setInterval(updatePendingRequestsBadge, 60000);
+    });
+    </script>
+    
     @yield('js')
     <!-- Main JS -->
     {{-- <script src="{{ asset('js/ui-toasts.js') }}"></script> --}}

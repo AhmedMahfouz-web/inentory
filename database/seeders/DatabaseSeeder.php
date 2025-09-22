@@ -16,52 +16,60 @@ class DatabaseSeeder extends Seeder
     /**
      * List of applications to add.
      */
-    // private $permissions = [
-    //     'role-list',
-    //     'role-create',
-    //     'role-edit',
-    //     'role-delete',
-    //     'product-show',
-    //     'product-create',
-    //     'product-edit',
-    //     'product-delete',
-    //     'user-show',
-    //     'user-create',
-    //     'user-edit',
-    //     'user-delete',
-    //     'product_added-show',
-    //     'product_added-create',
-    //     'product_added-edit',
-    //     'product_added-delete',
-    //     'product_increased-show',
-    //     'product_increased-create',
-    //     'product_increased-edit',
-    //     'product_increased-delete',
-    //     'unit-show',
-    //     'unit-create',
-    //     'unit-edit',
-    //     'unit-delete',
-    //     'supplier-show',
-    //     'supplier-create',
-    //     'supplier-edit',
-    //     'supplier-delete',
-    //     'supplier_category-show',
-    //     'supplier_category-create',
-    //     'supplier_category-edit',
-    //     'supplier_category-delete',
-    //     'category-show',
-    //     'category-create',
-    //     'category-edit',
-    //     'category-delete',
-    //     'branch-show',
-    //     'branch-create',
-    //     'branch-edit',
-    //     'branch-delete',
-    //     'product_branch-show',
-    //     'product_branch-create',
-    //     'product_branch-edit',
-    //     'product_branch-delete',
-    // ];
+    private $permissions = [
+        'role-list',
+        'role-create',
+        'role-edit',
+        'role-delete',
+        'product-show',
+        'product-create',
+        'product-edit',
+        'product-delete',
+        'user-show',
+        'user-create',
+        'user-edit',
+        'user-delete',
+        'product_added-show',
+        'product_added-create',
+        'product_added-edit',
+        'product_added-delete',
+        'product_increased-show',
+        'product_increased-create',
+        'product_increased-edit',
+        'product_increased-delete',
+        'unit-show',
+        'unit-create',
+        'unit-edit',
+        'unit-delete',
+        'supplier-show',
+        'supplier-create',
+        'supplier-edit',
+        'supplier-delete',
+        'supplier_category-show',
+        'supplier_category-create',
+        'supplier_category-edit',
+        'supplier_category-delete',
+        'category-show',
+        'category-create',
+        'category-edit',
+        'category-delete',
+        'branch-show',
+        'branch-create',
+        'branch-edit',
+        'branch-delete',
+        'product_branch-show',
+        'product_branch-create',
+        'product_branch-edit',
+        'product_branch-delete',
+            'order_show',
+            'order_print',
+            'order_edit',
+            'order_delete',
+            'sub_category_show',
+            'sub_category_create',
+            'sub_category_edit',
+            'sub_category_delete',
+    ];
     // private $permissions = [
     //     'order_show',
     //     'order_print',
@@ -72,7 +80,7 @@ class DatabaseSeeder extends Seeder
     //     'sub_category_edit',
     //     'sub_category_delete',
     // ];
-    private $dataArray = [
+    // private $dataArray = [
         // ["S-S-1", "علب كهرباء", 8, 28],
         // ["S-S-2", "خابور", 8, 28],
         // ["S-S-3", "صواميل", 8, 28],
@@ -158,49 +166,49 @@ class DatabaseSeeder extends Seeder
         // ["S-S-83", "اسهم لعبة دارت بدون سن", 8, 28],
         // ["S-S-84", "كتالوج+انتينا لعبة دارت", 8, 27],
         // ["S-S-85", "مفاتيح الالعاب", "", 28],
-        ["S-S-86", "قفل", 8, 28],
-        ["S-S-87", "بوردة خاصة بال vr", 8, 27],
-        ["S-S-88", "كابل شاشة VR", 8, 27],
-        ["S-S-89", "كأبل نضارة VR", 8, 27],
-        ["S-S-90", "حزام حساس ارض ارينا", 8, 27],
-        ["S-S-91", "HTC بالشاحن", 8, 27],
-        ["S-S-92", "connect لحزام الارينا", 8, 27],
-        ["S-S-93", "فيشا كهرباء حائط", 8, 28],
-        ["S-S-94", "وش فيشا كهربا غطاء", 8, 28],
-        ["S-S-95", "حساس ضوئي k1669 لعبة basket", 8, 27],
-        ["S-S-96", "hard ware GX CAB لعبة basket", 8, 27],
-        ["S-S-97", "زرار اختيارات صغير basket", 8, 27],
-        ["S-S-98", "زرار اختيارات كبير basket", 8, 27],
-        ["S-S-99", "photoelectric switch Basketball", 8, 27],
-        ["S-S-100", "حساس باسكت بول", 8, 27],
-        ["S-S-101", "زرار اسود تشغيل لعبة ACNE", 8, 27],
-        ["S-S-102", "زرار ابيض تشغيل لعبة ACNE", 8, 27],
-        ["S-S-103", "JOYSTIC لعبة ACME", 8, 27],
-        ["S-S-104", "POWER SUPPLY لعبة ACME", 8, 27],
-        ["S-S-105", "حساس زرار لعبة ACME", 8, 27],
-        ["S-S-106", "PANDORA BOX تشغيل العاب للعبة ACME", 8, 27],
-        ["S-S-107", "علبة كوين باسكت صغير", 8, 27],
-        ["S-S-108", "علبة كوين باسكت كبير", 8, 27],
-        ["S-S-109", "منفاح كور صغير", 8, 28],
-        ["S-S-110", "كور باسكت صغير", 8, 28],
-        ["S-S-111", "كابل باور", 8, 28],
-        ["S-S-112", "سوستة لعبة VR SPACE WHEEL", 8, 27],
-        ["S-S-113", "كابل ريدر سحب كروت علي الالعاب", 8, 27],
-        ["S-S-114", "شاحن بطارية", 8, 27],
-        ["S-S-115", "بطارية USB", 8, 28],
-        ["S-S-116", "بطارية عادية", 8, 28],
-        ["S-S-117", "بطارية صغيرة", 8, 28],
-        ["S-S-118", "CONNECTION CABLE", 8, 28],
-        ["S-S-119", "CONNECTION CABLE enternet", 8, 28],
-        ["S-S-120", "power supply 250V", 8, 28],
-        ["S-S-121", "H310MDs2", 8, 27],
-        ["S-S-122", "عصا بلياردو", 8, 28],
-        ["S-S-123", "حزام كرسي vr", 8, 27],
-        ["S-S-124", "حزام نضارة vr", 8, 27],
-        ["S-S-125", "زرار up vr", 8, 27],
-        ["S-S-126", "زرار down vr", 8, 27],
-        ["S-S-127", "joystic كرسي vr", 8, 27]
-    ];
+    //     ["S-S-86", "قفل", 8, 28],
+    //     ["S-S-87", "بوردة خاصة بال vr", 8, 27],
+    //     ["S-S-88", "كابل شاشة VR", 8, 27],
+    //     ["S-S-89", "كأبل نضارة VR", 8, 27],
+    //     ["S-S-90", "حزام حساس ارض ارينا", 8, 27],
+    //     ["S-S-91", "HTC بالشاحن", 8, 27],
+    //     ["S-S-92", "connect لحزام الارينا", 8, 27],
+    //     ["S-S-93", "فيشا كهرباء حائط", 8, 28],
+    //     ["S-S-94", "وش فيشا كهربا غطاء", 8, 28],
+    //     ["S-S-95", "حساس ضوئي k1669 لعبة basket", 8, 27],
+    //     ["S-S-96", "hard ware GX CAB لعبة basket", 8, 27],
+    //     ["S-S-97", "زرار اختيارات صغير basket", 8, 27],
+    //     ["S-S-98", "زرار اختيارات كبير basket", 8, 27],
+    //     ["S-S-99", "photoelectric switch Basketball", 8, 27],
+    //     ["S-S-100", "حساس باسكت بول", 8, 27],
+    //     ["S-S-101", "زرار اسود تشغيل لعبة ACNE", 8, 27],
+    //     ["S-S-102", "زرار ابيض تشغيل لعبة ACNE", 8, 27],
+    //     ["S-S-103", "JOYSTIC لعبة ACME", 8, 27],
+    //     ["S-S-104", "POWER SUPPLY لعبة ACME", 8, 27],
+    //     ["S-S-105", "حساس زرار لعبة ACME", 8, 27],
+    //     ["S-S-106", "PANDORA BOX تشغيل العاب للعبة ACME", 8, 27],
+    //     ["S-S-107", "علبة كوين باسكت صغير", 8, 27],
+    //     ["S-S-108", "علبة كوين باسكت كبير", 8, 27],
+    //     ["S-S-109", "منفاح كور صغير", 8, 28],
+    //     ["S-S-110", "كور باسكت صغير", 8, 28],
+    //     ["S-S-111", "كابل باور", 8, 28],
+    //     ["S-S-112", "سوستة لعبة VR SPACE WHEEL", 8, 27],
+    //     ["S-S-113", "كابل ريدر سحب كروت علي الالعاب", 8, 27],
+    //     ["S-S-114", "شاحن بطارية", 8, 27],
+    //     ["S-S-115", "بطارية USB", 8, 28],
+    //     ["S-S-116", "بطارية عادية", 8, 28],
+    //     ["S-S-117", "بطارية صغيرة", 8, 28],
+    //     ["S-S-118", "CONNECTION CABLE", 8, 28],
+    //     ["S-S-119", "CONNECTION CABLE enternet", 8, 28],
+    //     ["S-S-120", "power supply 250V", 8, 28],
+    //     ["S-S-121", "H310MDs2", 8, 27],
+    //     ["S-S-122", "عصا بلياردو", 8, 28],
+    //     ["S-S-123", "حزام كرسي vr", 8, 27],
+    //     ["S-S-124", "حزام نضارة vr", 8, 27],
+    //     ["S-S-125", "زرار up vr", 8, 27],
+    //     ["S-S-126", "زرار down vr", 8, 27],
+    //     ["S-S-127", "joystic كرسي vr", 8, 27]
+    // ];
 
     // /**
     //  * Seed the application's database.
@@ -208,27 +216,27 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        foreach ($this->dataArray as $product) {
-            product::create([
-                'name' => $product[1],
-                'code' => $product[0],
-                'category_id' => $product[3],
-                'unit_id' => $product[2],
-                'stock' => 0,
-                'price' => 0
-            ]);
-        }
+        // foreach ($this->dataArray as $product) {
+        //     product::create([
+        //         'name' => $product[1],
+        //         'code' => $product[0],
+        //         'category_id' => $product[3],
+        //         'unit_id' => $product[2],
+        //         'stock' => 0,
+        //         'price' => 0
+        //     ]);
+        // }
         // Create admin User and assign the role to him.
-        // $user = User::create([
-        //     'name' => 'Mohamed Ahmed',
-        //     'username' => 'admin',
-        //     'email' => 'mohamed_ahmed@gmail.com',
-        //     'password' => Hash::make('password')
-        // ]);
+        $user = User::create([
+            'name' => 'Mohamed Ahmed',
+            'username' => 'admin',
+            'email' => 'mohamed_ahmed@gmail.com',
+            'password' => 'password'
+        ]);
+ Role::create(['name' => 'Admin']);
+        $role = Role::where(['name' => 'Admin'])->first();
 
-        // $role = Role::where(['name' => 'Admin'])->first();
-
-        // $user->assignRole([$role->id]);
+        $user->assignRole([$role->id]);
     }
 
     // private $data = [

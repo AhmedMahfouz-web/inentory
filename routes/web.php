@@ -14,6 +14,10 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SellController;
 use App\Http\Controllers\StartController;
 use App\Http\Controllers\StartInventoryController;
+use App\Http\Controllers\MonthlyStartController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProductRequestController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
@@ -127,12 +131,25 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('{branch_id}', 'index')->name('start');
         Route::post('store/{branch_id}', 'store')->name('store start');
         Route::get('store/auto', 'store_auto')->name('store start auto');
+        Route::get('store/auto-mysql', 'store_auto_mysql')->name('store start auto mysql');
     });
 
     Route::group(['prefix' => 'inventory', 'controller' => StartInventoryController::class], function ($router) {
         Route::get('/start', 'index')->name('start inventory');
         Route::post('/start', 'store')->name('store start_inventory');
         Route::get('/qty_start', 'qty_store');
+        Route::get('/auto_generate', 'auto_generate')->name('auto generate main inventory');
+    });
+
+    // New Monthly Start Management Routes
+    Route::group(['prefix' => 'monthly-starts', 'controller' => MonthlyStartController::class], function ($router) {
+        Route::get('/', 'index')->name('monthly starts');
+        Route::post('/generate-current', 'generateCurrent')->name('generate current month starts');
+        Route::post('/generate-month', 'generateForMonth')->name('generate month starts');
+        Route::get('/report', 'report')->name('monthly starts report');
+        Route::get('/category-report', 'categoryReport')->name('monthly starts category report');
+        Route::get('/check-exists', 'checkExists')->name('check monthly starts exists');
+        Route::get('/summary', 'getSummary')->name('monthly starts summary');
     });
 
     Route::group(['prefix' => 'sell', 'controller' => SellController::class], function ($router) {
@@ -154,6 +171,44 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/store', 'store')->name('store role');
         Route::get('/edit/{role}', 'edit')->name('edit role');
         Route::post('/update/{role}', 'update')->name('update role');
+    });
+
+    // Product Request Routes
+    Route::group(['prefix' => 'product-requests', 'controller' => ProductRequestController::class], function ($router) {
+        // Branch routes
+        Route::get('/', 'index')->name('product-requests.index');
+        Route::get('/create', 'create')->name('product-requests.create');
+        Route::post('/store', 'store')->name('product-requests.store');
+        Route::get('/{productRequest}', 'show')->name('product-requests.show');
+        Route::post('/{productRequest}/cancel', 'cancel')->name('product-requests.cancel');
+        
+        // Warehouse keeper routes
+        Route::get('/warehouse/dashboard', 'warehouseDashboard')->name('product-requests.warehouse-dashboard');
+        Route::get('/{productRequest}/approve', 'showApprove')->name('product-requests.show-approve');
+        Route::post('/{productRequest}/approve', 'approve')->name('product-requests.approve');
+        Route::get('/{productRequest}/fulfill', 'showFulfill')->name('product-requests.show-fulfill');
+        Route::post('/{productRequest}/fulfill', 'fulfill')->name('product-requests.fulfill');
+        
+        // API routes
+        Route::get('/api/{productRequest}/data', 'getRequestData')->name('product-requests.api.data');
+        Route::get('/api/pending-count', 'getPendingCount')->name('product-requests.api.pending-count');
+        Route::get('/api/statistics', 'getStatistics')->name('product-requests.api.statistics');
+        Route::get('/api/products/search', 'searchProducts')->name('product-requests.api.search-products');
+        Route::get('/api/products/{product}/stock', 'getProductStock')->name('product-requests.api.product-stock');
+    });
+
+    // API Routes for Header functionality
+    Route::group(['prefix' => 'api'], function () {
+        // Notifications
+        Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('api.notifications');
+        Route::get('/notifications/counts', [NotificationController::class, 'getNotificationCounts'])->name('api.notifications.counts');
+        Route::post('/notifications/mark-read', [NotificationController::class, 'markAsRead'])->name('api.notifications.mark-read');
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('api.notifications.mark-all-read');
+        
+        // Search
+        Route::get('/search', [SearchController::class, 'globalSearch'])->name('api.search');
+        Route::get('/search/products', [SearchController::class, 'quickProductSearch'])->name('api.search.products');
+        Route::get('/search/suggestions', [SearchController::class, 'getSearchSuggestions'])->name('api.search.suggestions');
     });
 
     Route::group(['controller' => LoginController::class], function ($router) {
