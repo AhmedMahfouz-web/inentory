@@ -312,6 +312,38 @@ Route::group(['middleware' => 'auth'], function () {
         }
     });
 
+    // Debug route to check current user permissions
+    Route::get('/debug/check-permissions', function() {
+        $user = auth()->user();
+        
+        $userRoles = $user->roles->pluck('name')->toArray();
+        $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
+        
+        $checkPermissions = [
+            'product-request-show',
+            'product-request-create',
+            'product-request-edit',
+            'product-request-delete',
+            'role-list',
+            'role-create',
+            'user-show',
+            'product-show'
+        ];
+        
+        $permissionStatus = [];
+        foreach ($checkPermissions as $permission) {
+            $permissionStatus[$permission] = $user->can($permission) ? '✅' : '❌';
+        }
+        
+        return [
+            'user' => $user->name,
+            'roles' => $userRoles,
+            'total_permissions' => count($userPermissions),
+            'permission_check' => $permissionStatus,
+            'sample_permissions' => array_slice($userPermissions, 0, 10)
+        ];
+    });
+
     Route::group(['controller' => LoginController::class], function ($router) {
         Route::post('/logout', 'logout')->name('logout');
     });

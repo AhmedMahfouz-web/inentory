@@ -65,31 +65,6 @@
             </li>
         @endcan
 
-        <!-- Product Requests -->
-        <li class="menu-item {{ Request::is('product-requests/*', 'product-requests') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons ti ti-file-text"></i>
-                <div data-i18n="طلبات المنتجات">طلبات المنتجات</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ Request::is('product-requests') ? 'active' : '' }}">
-                    <a href="{{ route('product-requests.index') }}" class="menu-link">
-                        <div data-i18n="عرض الطلبات">عرض الطلبات</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ Request::is('product-requests/create') ? 'active' : '' }}">
-                    <a href="{{ route('product-requests.create') }}" class="menu-link">
-                        <div data-i18n="طلب جديد">طلب جديد</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ Request::is('product-requests/warehouse/dashboard') ? 'active' : '' }}">
-                    <a href="{{ route('product-requests.warehouse-dashboard') }}" class="menu-link">
-                        <div data-i18n="لوحة أمين المخزن">لوحة أمين المخزن</div>
-                        <span class="badge badge-center rounded-pill bg-danger ms-auto" id="pending-requests-badge" style="display: none;">0</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
 
         @can('product_increased-show')
             <li class="menu-item {{ Request::is('product_increase/*', 'product_increase') ? 'active open' : '' }}">
@@ -403,6 +378,14 @@
                         <li class="menu-item {{ Request::is('product-requests/create') ? 'active' : '' }}">
                             <a href="{{ route('product-requests.create') }}" class="menu-link">
                                 <div data-i18n="إنشاء طلب جديد">إنشاء طلب جديد</div>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('product-request-approve')
+                        <li class="menu-item {{ Request::is('product-requests/warehouse/dashboard') ? 'active' : '' }}">
+                            <a href="{{ route('product-requests.warehouse-dashboard') }}" class="menu-link">
+                                <div data-i18n="لوحة أمين المخزن">لوحة أمين المخزن</div>
+                                <span class="badge badge-center rounded-pill bg-danger ms-auto" id="pending-requests-badge" style="display: none;">0</span>
                             </a>
                         </li>
                     @endcan
