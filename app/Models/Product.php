@@ -91,6 +91,22 @@ class Product extends Model
         return $this->hasManyThrough(Sell::class, Product_branch::class, 'product_id', 'product_branch_id', 'id', 'id');
     }
 
+    /**
+     * Get the start inventory records for this product (main inventory starts)
+     */
+    public function start()
+    {
+        return $this->hasMany(Start_Inventory::class, 'product_id', 'id');
+    }
+
+    /**
+     * Get the starts through product branches (branch-level starts)
+     */
+    public function branchStarts()
+    {
+        return $this->hasManyThrough(Start::class, Product_branch::class, 'product_id', 'product_branch_id', 'id', 'id');
+    }
+
     // Scopes
     public function scopeActive(Builder $query)
     {
