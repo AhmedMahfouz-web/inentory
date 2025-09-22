@@ -78,7 +78,50 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        $user->update([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+        ]);
+
+        if ($request->filled('password')) {
+            $user->update(['password' => $request->password]);
+        }
+
+        if ($request->filled('role')) {
+            $user->syncRoles([$request->role]);
+        }
+
+        return redirect()->route('show users')->with('success', 'تم تحديث المستخدم بنجاح');
+    }
+
+    /**
+     * Show role assignment form
+     */
+    public function showAssignRole(User $user)
+    {
+        $roles = Role::with('permissions')->get();
+        return view('users.assign-role', compact('user', 'roles'));
+    }
+
+    /**
+     * Assign role to user
+     */
+    public function assignRole(Request $request, User $user)
+    {
+        $request->validate([
+            'role' => 'nullable|exists:roles,name'
+        ]);
+
+        if ($request->filled('role')) {
+            $user->syncRoles([$request->role]);
+            $message = "تم تعيين دور '{$request->role}' للمستخدم '{$user->name}' بنجاح";
+        } else {
+            $user->syncRoles([]);
+            $message = "تم إزالة جميع الأدوار من المستخدم '{$user->name}' بنجاح";
+        }
+
+        return redirect()->route('show users')->with('success', $message);
     }
 
     /**
@@ -86,6 +129,7 @@ class UsersController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return redirect()->route('show users')->with('success', 'تم حذف المستخدم بنجاح');
     }
 }

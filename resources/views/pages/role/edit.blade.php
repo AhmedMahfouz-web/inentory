@@ -14,7 +14,7 @@
 @section('content')
     <div class="card mb-4">
         <h5 class="card-header">تعديل الوظيفة</h5>
-        <form class="card-body" method="post" action="{{ route('update role', $role->id) }}">
+        <form class="card-body" method="put" action="{{ route('update role', $role->id) }}">
             @csrf
             <div class="row g-3">
                 <div class="col-md-6">

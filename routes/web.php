@@ -163,7 +163,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/create', 'create')->name('create user');
         Route::post('/store', 'store')->name('store user');
         Route::get('/edit/{user}', 'edit')->name('edit user');
-        Route::post('/update/{user}', 'update')->name('update user');
+        Route::put('/update/{user}', 'update')->name('update user');
+        Route::delete('/delete/{user}', 'destroy')->name('delete user');
+        
+        // Role assignment routes
+        Route::get('/{user}/assign-role', 'showAssignRole')->name('users.assign-role-form');
+        Route::post('/{user}/assign-role', 'assignRole')->name('users.assign-role');
     });
 
     Route::group(['controller' => RolesController::class, 'prefix' => 'roles'], function ($router) {
@@ -255,6 +260,43 @@ Route::group(['middleware' => 'auth'], function () {
                 ];
             })
         ];
+    });
+
+    // Debug route to setup permissions and assign admin role
+    Route::get('/debug/setup-permissions', function() {
+        try {
+            // Run the seeder
+            Artisan::call('db:seed', ['--class' => 'SimplePermissionsSeeder']);
+            
+            $user = auth()->user();
+            
+            // Assign admin role to current user
+            $adminRole = \Spatie\Permission\Models\Role::where('name', 'admin')->first();
+            if ($adminRole) {
+                $user->assignRole('admin');
+                $message = "✅ Permissions created and admin role assigned to '{$user->name}'";
+            } else {
+                $message = "❌ Admin role not found after seeding";
+            }
+            
+            // Also assign a branch
+            $branches = \App\Models\Branch::all();
+            if ($branches->isNotEmpty()) {
+                \App\Models\UserBranch::updateOrCreate([
+                    'user_id' => $user->id,
+                    'branch_id' => $branches->first()->id,
+                ], [
+                    'can_request' => true,
+                    'can_manage' => true,
+                ]);
+                $message .= "<br>✅ Branch '{$branches->first()->name}' assigned";
+            }
+            
+            return $message;
+            
+        } catch (\Exception $e) {
+            return "❌ Error: " . $e->getMessage();
+        }
     });
 
     Route::group(['controller' => LoginController::class], function ($router) {
