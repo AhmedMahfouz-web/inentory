@@ -36,7 +36,7 @@ class HomeController extends Controller
         )->withSum(
             [
                 'sell' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                    $q->whereBetween('sells.created_at', [$currentMonthStart, $currentMonthEnd]);
+                    $q->whereRaw('sells.created_at BETWEEN ? AND ?', [$currentMonthStart, $currentMonthEnd]);
                 }
             ],
             'qty'

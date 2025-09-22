@@ -139,7 +139,7 @@ class CacheService
             return \App\Models\Branch::withCount(['product_branches'])
                 ->with(['product_branches' => function ($query) use ($currentMonthStart, $currentMonthEnd) {
                     $query->withSum(['sell' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                        $q->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd]);
+                        $q->whereRaw('sells.created_at BETWEEN ? AND ?', [$currentMonthStart, $currentMonthEnd]);
                     }], 'qty');
                 }])
                 ->get()

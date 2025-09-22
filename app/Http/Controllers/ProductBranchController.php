@@ -29,7 +29,7 @@ class ProductBranchController extends Controller
                 )->withSum(
                     [
                         'sell' => function ($q) use ($start, $end) {
-                            $q->whereBetween('created_at', [$start, $end]);
+                            $q->whereRaw('sells.created_at BETWEEN ? AND ?', [$start, $end]);
                         }
                     ],
                     'qty'
@@ -57,7 +57,7 @@ class ProductBranchController extends Controller
                 )->withSum(
                     [
                         'sell' => function ($q) {
-                            $q->whereBetween('created_at', [date('Y-m') . '-01', date('Y-m') . '-31']);
+                            $q->whereRaw('sells.created_at BETWEEN ? AND ?', [date('Y-m') . '-01', date('Y-m') . '-31']);
                         }
                     ],
                     'qty'
