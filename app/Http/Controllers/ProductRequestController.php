@@ -18,6 +18,14 @@ class ProductRequestController extends Controller
     public function __construct(ProductRequestService $productRequestService)
     {
         $this->productRequestService = $productRequestService;
+        
+        // Add middleware for permission checking
+        $this->middleware(['permission:product-request-show|product-request-create|product-request-edit|product-request-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:product-request-create'], ['only' => ['create', 'store']]);
+        $this->middleware(['permission:product-request-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:product-request-delete'], ['only' => ['destroy']]);
+        $this->middleware(['permission:product-request-approve'], ['only' => ['warehouseDashboard', 'showApprove', 'approve']]);
+        $this->middleware(['permission:product-request-fulfill'], ['only' => ['showFulfill', 'fulfill']]);
     }
 
     /**

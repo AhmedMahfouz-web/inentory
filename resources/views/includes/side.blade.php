@@ -361,6 +361,16 @@
             </li>
         @endcan
 
+        <!-- Import Data -->
+        @can('product-create')
+            <li class="menu-item {{ Request::is('imports/*', 'imports') ? 'active' : '' }}">
+                <a href="{{ route('imports.index') }}" class="menu-link">
+                    <i class="menu-icon ti ti-file-import"></i>
+                    <div data-i18n="استيراد البيانات">استيراد البيانات</div>
+                </a>
+            </li>
+        @endcan
+
         <!-- Product Requests -->
         @can('product-request-show')
             <li class="menu-item {{ Request::is('product-requests/*', 'product-requests') ? 'active open' : '' }}">

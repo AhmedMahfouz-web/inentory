@@ -108,6 +108,12 @@ class SimplePermissionsSeeder extends Seeder
             'user-branch-create',
             'user-branch-edit',
             'user-branch-delete',
+            
+            // Import permissions
+            'import-products',
+            'import-categories',
+            'import-units',
+            'import-sub-categories',
         ];
 
         foreach ($permissions as $permission) {

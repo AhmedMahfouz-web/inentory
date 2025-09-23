@@ -192,6 +192,16 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/{user}/branches', 'getUserBranches')->name('user-branches.get-user-branches');
     });
 
+    // Import Routes
+    Route::group(['prefix' => 'imports', 'controller' => ImportController::class], function ($router) {
+        Route::get('/', 'index')->name('imports.index');
+        Route::post('/products', 'importProducts')->name('imports.products');
+        Route::post('/units', 'importUnits')->name('imports.units');
+        Route::post('/categories', 'importCategories')->name('imports.categories');
+        Route::post('/sub-categories', 'importSubCategories')->name('imports.sub-categories');
+        Route::get('/template/{type}', 'downloadTemplate')->name('imports.template');
+    });
+
     Route::group(['prefix' => 'product-requests', 'controller' => ProductRequestController::class], function ($router) {
         // Branch routes
         Route::get('/', 'index')->name('product-requests.index');
@@ -316,9 +326,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/debug/check-permissions', function() {
         $user = auth()->user();
         
+        // Get all permissions from database
+        $allDbPermissions = \Spatie\Permission\Models\Permission::all()->pluck('name')->toArray();
+        
+        // Get user's permissions
         $userRoles = $user->roles->pluck('name')->toArray();
         $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
         
+        // Check specific permissions
         $checkPermissions = [
             'product-request-show',
             'product-request-create',
@@ -332,15 +347,46 @@ Route::group(['middleware' => 'auth'], function () {
         
         $permissionStatus = [];
         foreach ($checkPermissions as $permission) {
-            $permissionStatus[$permission] = $user->can($permission) ? '✅' : '❌';
+            $exists = in_array($permission, $allDbPermissions);
+            $hasPermission = $user->can($permission);
+            $permissionStatus[$permission] = [
+                'exists_in_db' => $exists ? '✅' : '❌',
+                'user_has_it' => $hasPermission ? '✅' : '❌',
+                'status' => ($exists && $hasPermission) ? '✅ GOOD' : '❌ PROBLEM'
+            ];
         }
+        
+        // Find product-request related permissions in DB
+        $productRequestPerms = array_filter($allDbPermissions, function($perm) {
+            return strpos($perm, 'product-request') !== false || strpos($perm, 'product_request') !== false;
+        });
         
         return [
             'user' => $user->name,
             'roles' => $userRoles,
-            'total_permissions' => count($userPermissions),
-            'permission_check' => $permissionStatus,
-            'sample_permissions' => array_slice($userPermissions, 0, 10)
+            'total_db_permissions' => count($allDbPermissions),
+            'user_total_permissions' => count($userPermissions),
+            'permission_detailed_check' => $permissionStatus,
+            'product_request_permissions_in_db' => array_values($productRequestPerms),
+            'sample_db_permissions' => array_slice($allDbPermissions, 0, 15),
+            'sample_user_permissions' => array_slice($userPermissions, 0, 15)
+        ];
+    });
+
+    // Temporary test route to bypass permissions
+    Route::get('/debug/test-product-request', function() {
+        $user = auth()->user();
+        $branches = \App\Models\Branch::all();
+        $products = \App\Models\Product::with(['sub_category', 'unit'])->take(5)->get();
+        
+        return [
+            'message' => 'This route bypasses permissions to test basic functionality',
+            'user' => $user->name,
+            'branches_count' => $branches->count(),
+            'products_count' => $products->count(),
+            'can_access_basic_data' => true,
+            'branches' => $branches->pluck('name')->toArray(),
+            'sample_products' => $products->pluck('name')->toArray()
         ];
     });
 
