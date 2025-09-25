@@ -109,10 +109,10 @@
                                         {{ empty($product['product']->start[0]->qty) ? '' : $product['product']->start[0]->qty }}
                                     </td>
                                     <td>
-                                        {{ $product['product']->product_added->qty }}
+                                        {{ $product['product']->product_added->sum('qty') }}
                                     </td>
                                     <td>
-                                        {{ $product['product']->sell->qty }}
+                                        {{ $product['product']->sell->sum('qty') }}
                                     </td>
                                     <td>
                                         {{ empty($product['product']->start[0]->qty) ? $product['product']->product_added->qty - $product['product']->sell->qty : $product['product']->product_added->qty + $product['product']->start[0]->qty - $product['product']->sell->qty }}
