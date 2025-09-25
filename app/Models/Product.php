@@ -65,24 +65,9 @@ class Product extends Model
         return $this->hasMany(Product_branch::class, 'product_id', 'id');
     }
 
-    public function increased_products()
-    {
-        return $this->hasMany(IncreasedProduct::class, 'product_id', 'id');
-    }
-
-    public function product_addeds()
-    {
-        return $this->hasMany(ProductAdded::class, 'product_id', 'id');
-    }
-
     public function product_added()
     {
-        return $this->hasMany(ProductAdded::class, 'product_id', 'id');
-    }
-
-    public function sells()
-    {
-        return $this->hasMany(ProductAdded::class, 'product_id', 'id');
+        return $this->hasMany(IncreasedProduct::class, 'product_id', 'id');
     }
 
     public function sell()
@@ -90,16 +75,19 @@ class Product extends Model
         return $this->hasMany(ProductAdded::class, 'product_id', 'id');
     }
 
-    // Fixed relationship - sells should be through product_branches
-    // public function sells()
-    // {
-    //     return $this->hasManyThrough(Sell::class, Product_branch::class, 'product_id', 'product_branch_id', 'id', 'id');
-    // }
+    public function qty($date)
+    {
+        $added = $this->product_added()->whereDate('created_at', '>=', $date . '-01')->whereDate('created_at', '<=', $date . '-31')->sum('qty');
+        $start = $this->start()->whereDate('month', $date . '-01')->first();
+        $sell = $this->sell()->whereDate('created_at', '>=', $date . '-01')->whereDate('created_at', '<=', $date . '-31')->sum('qty');
 
-    // public function sell()
-    // {
-    //     return $this->hasManyThrough(Sell::class, Product_branch::class, 'product_id', 'product_branch_id', 'id', 'id');
-    // }
+        if (empty($start)) {
+            $total = $added - $sell;
+        } else {
+            $total = $start->qty + $added - $sell;
+        }
+        return $total;
+    }
 
     /**
      * Get the start inventory records for this product (main inventory starts)
@@ -269,8 +257,8 @@ class Product extends Model
     }
 
     // Legacy method for backward compatibility (improved)
-    public function qty($date)
-    {
-        return $this->getQuantityForMonth($date);
-    }
+    // public function qty($date)
+    // {
+    //     return $this->getQuantityForMonth($date);
+    // }
 }
