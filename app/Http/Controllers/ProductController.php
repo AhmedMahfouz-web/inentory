@@ -101,7 +101,7 @@ class ProductController extends Controller
                 }
             ])->withSum(
                 [
-                    'increased_product' => function ($q) use ($start, $end) {
+                    'increased_products' => function ($q) use ($start, $end) {
                         $q->whereBetween('created_at', [$start, $end]);
                     }
                 ],
@@ -124,7 +124,7 @@ class ProductController extends Controller
             ])
                 ->withSum(
                     [
-                        'increased_product' => function ($q) {
+                        'increased_products' => function ($q) {
                             $q->whereBetween('created_at', [date('Y-m') . '-01', date('Y-m') . '-31']);
                         }
                     ],

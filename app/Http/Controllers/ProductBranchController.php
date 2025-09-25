@@ -21,7 +21,7 @@ class ProductBranchController extends Controller
                     }
                 ])->withSum(
                     [
-                        'increased_product' => function ($q) use ($start, $end, $branch_id) {
+                        'product_added' => function ($q) use ($start, $end, $branch_id) {
                             $q->whereBetween('created_at', [$start, $end])->where('branch_id', $branch_id->id);
                         }
                     ],
@@ -46,7 +46,7 @@ class ProductBranchController extends Controller
                 ])
                 ->withSum(
                     [
-                        'increased_product' => function ($q) use ($branch_id) {
+                        'product_added' => function ($q) use ($branch_id) {
                             $q->where('branch_id', $branch_id->id)->whereBetween('created_at', [date('Y-m') . '-01', date('Y-m') . '-31']);
                         }
                         // 'product_added' => function ($q) use ($branch_id) {
