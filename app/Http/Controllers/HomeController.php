@@ -103,20 +103,6 @@ class HomeController extends Controller
 
     private function getRecentActivity($limit = 10)
     {
-        $recentSells = Sell::with(['product_branch.product', 'product_branch.branch'])
-            ->orderBy('updated_at', 'desc')
-            ->limit($limit)
-            ->get()
-            ->map(function ($sell) {
-                return [
-                    'type' => 'sell',
-                    'description' => 'بيع ' . ($sell->product_branch->product->name ?? 'منتج') . ' من ' . ($sell->product_branch->branch->name ?? 'فرع'),
-                    'quantity' => $sell->qty,
-                    'created_at' => $sell->created_at,
-                    'icon' => 'ti-shopping-cart',
-                    'color' => 'danger'
-                ];
-            });
 
         $recentAdditions = ProductAdded::with(['product', 'branch'])
             ->orderBy('updated_at', 'desc')
@@ -133,8 +119,7 @@ class HomeController extends Controller
                 ];
             });
 
-        return $recentSells->concat($recentAdditions)
-            ->sortByDesc('updated_at')
+        return $recentAdditions
             ->take($limit);
     }
 
