@@ -196,8 +196,8 @@ class Product extends Model
 
         // Get sold quantity for the month (through product_branches)
         $soldQty = $this->sells()
-            ->whereBetween('sells.created_at', [$startDate, $endDate])
-            ->sum('sells.qty');
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('qty');
 
         return max(0, $startQty + $addedQty - $soldQty);
     }
@@ -244,7 +244,7 @@ class Product extends Model
         // Add sales
         $sales = $this->sells()
             ->with('product_branch.branch')
-            ->latest('sells.created_at')
+            ->latest('increased_products.created_at')
             ->limit($limit)
             ->get()
             ->map(function ($sell) {
