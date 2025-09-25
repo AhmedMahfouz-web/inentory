@@ -80,7 +80,7 @@ class Product extends Model
         return $this->hasMany(ProductAdded::class, 'product_id', 'id');
     }
 
-    public function sell()
+    public function sells()
     {
         return $this->hasMany(IncreasedProduct::class, 'product_id', 'id');
     }
