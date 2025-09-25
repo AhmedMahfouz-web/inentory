@@ -119,7 +119,7 @@ class HomeController extends Controller
             });
 
         $recentAdditions = ProductAdded::with(['product', 'branch'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->limit($limit)
             ->get()
             ->map(function ($addition) {
@@ -134,7 +134,7 @@ class HomeController extends Controller
             });
 
         return $recentSells->concat($recentAdditions)
-            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
             ->take($limit);
     }
 
