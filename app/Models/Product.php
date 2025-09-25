@@ -116,8 +116,8 @@ class Product extends Model
     public function scopeLowStock(Builder $query)
     {
         return $query->whereColumn('stock', '<=', 'min_stock')
-                    ->whereNotNull('min_stock')
-                    ->where('min_stock', '>', 0);
+            ->whereNotNull('min_stock')
+            ->where('min_stock', '>', 0);
     }
 
     public function scopeOutOfStock(Builder $query)
@@ -134,7 +134,7 @@ class Product extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")
-              ->orWhere('code', 'like', "%{$search}%");
+                ->orWhere('code', 'like', "%{$search}%");
         });
     }
 
