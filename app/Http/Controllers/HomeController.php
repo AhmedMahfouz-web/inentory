@@ -104,7 +104,7 @@ class HomeController extends Controller
     private function getRecentActivity($limit = 10)
     {
         $recentSells = Sell::with(['product_branch.product', 'product_branch.branch'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->limit($limit)
             ->get()
             ->map(function ($sell) {
