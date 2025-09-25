@@ -70,7 +70,6 @@ class ProductBranchController extends Controller
                 'qty' => $product->qty($date, $branch_id->id),
             ];
         });
-        return $qty;
         return view('pages.product_branch.inventory', compact('products', 'branch_id', 'start', 'qty'));
     }
 }
