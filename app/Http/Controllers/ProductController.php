@@ -101,7 +101,7 @@ class ProductController extends Controller
                 }
             ])->withSum(
                 [
-                    'increased_products' => function ($q) use ($start, $end) {
+                    'product_added' => function ($q) use ($start, $end) {
                         $q->whereBetween('created_at', [$start, $end]);
                     }
                 ],
