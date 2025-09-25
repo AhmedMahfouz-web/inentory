@@ -109,7 +109,7 @@
                                         {{ empty($product['product']->start[0]->qty) ? '' : $product['product']->start[0]->qty }}
                                     </td>
                                     <td>
-                                        {{ $product['product']->product_added->qty }}
+                                        {{ $product['product']->increased_product->qty }}
                                     </td>
                                     <td>
                                         {{ $product['product']->sell->qty }}

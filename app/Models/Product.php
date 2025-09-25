@@ -82,12 +82,12 @@ class Product extends Model
 
     public function sells()
     {
-        return $this->hasMany(IncreasedProduct::class, 'product_id', 'id');
+        return $this->hasMany(ProductAdded::class, 'product_id', 'id');
     }
 
     public function sell()
     {
-        return $this->hasMany(IncreasedProduct::class, 'product_id', 'id');
+        return $this->hasMany(ProductAdded::class, 'product_id', 'id');
     }
 
     // Fixed relationship - sells should be through product_branches
