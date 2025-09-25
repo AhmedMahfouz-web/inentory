@@ -80,16 +80,21 @@ class Product extends Model
         return $this->hasMany(ProductAdded::class, 'product_id', 'id');
     }
 
-    // Fixed relationship - sells should be through product_branches
-    public function sells()
-    {
-        return $this->hasManyThrough(Sell::class, Product_branch::class, 'product_id', 'product_branch_id', 'id', 'id');
-    }
-
     public function sell()
     {
-        return $this->hasManyThrough(Sell::class, Product_branch::class, 'product_id', 'product_branch_id', 'id', 'id');
+        return $this->hasMany(IncreasedProduct::class, 'product_id', 'id');
     }
+
+    // Fixed relationship - sells should be through product_branches
+    // public function sells()
+    // {
+    //     return $this->hasManyThrough(Sell::class, Product_branch::class, 'product_id', 'product_branch_id', 'id', 'id');
+    // }
+
+    // public function sell()
+    // {
+    //     return $this->hasManyThrough(Sell::class, Product_branch::class, 'product_id', 'product_branch_id', 'id', 'id');
+    // }
 
     /**
      * Get the start inventory records for this product (main inventory starts)
