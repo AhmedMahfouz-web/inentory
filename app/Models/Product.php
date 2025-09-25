@@ -85,6 +85,11 @@ class Product extends Model
         return $this->hasMany(IncreasedProduct::class, 'product_id', 'id');
     }
 
+    public function sell()
+    {
+        return $this->hasMany(IncreasedProduct::class, 'product_id', 'id');
+    }
+
     // Fixed relationship - sells should be through product_branches
     // public function sells()
     // {
