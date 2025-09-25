@@ -23,13 +23,13 @@ class HomeController extends Controller
         $currentMonth = date('Y-m');
         $currentMonthStart = $currentMonth . '-01';
         $currentMonthEnd = $currentMonth . '-31';
-        
+
         // Existing data
         $branches = Branch::select('id', 'name')->get();
         $products = Product::withSum(
             [
                 'product_added' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                    $q->whereBetween('product_addeds.created_at', [$currentMonthStart, $currentMonthEnd]);
+                    $q->whereBetween('product_added.created_at', [$currentMonthStart, $currentMonthEnd]);
                 }
             ],
             'qty'
@@ -41,13 +41,13 @@ class HomeController extends Controller
             ],
             'qty'
         )->get();
-        
+
         $branches = Branch::with(['product_branches' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
             $q->with('product')->withSum(['product_added' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                $q->whereBetween('product_addeds.created_at', [$currentMonthStart, $currentMonthEnd]);
+                $q->whereBetween('product_added.created_at', [$currentMonthStart, $currentMonthEnd]);
             }], 'qty');
         }])->get();
-        
+
         $total_income = 0;
         $total_sells = 0;
         foreach ($products as $product) {
@@ -63,8 +63,8 @@ class HomeController extends Controller
         $monthlyStartsStatus = $this->getMonthlyStartsStatus($currentMonth);
 
         return view('welcome', compact(
-            'branches', 
-            'total_income', 
+            'branches',
+            'total_income',
             'total_sells',
             'dashboardStats',
             'lowStockProducts',
@@ -78,7 +78,7 @@ class HomeController extends Controller
     {
         $currentMonthStart = $currentMonth . '-01';
         $currentMonthEnd = $currentMonth . '-31';
-        
+
         return [
             'total_products' => Product::count(),
             'total_branches' => Branch::count(),
@@ -142,7 +142,7 @@ class HomeController extends Controller
     {
         $currentMonthStart = $currentMonth . '-01';
         $currentMonthEnd = $currentMonth . '-31';
-        
+
         return Branch::withCount(['product_branches'])
             ->with(['product_branches' => function ($query) use ($currentMonthStart, $currentMonthEnd) {
                 $query->withSum(['sell' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
@@ -155,7 +155,7 @@ class HomeController extends Controller
                 $totalValue = $branch->product_branches->sum(function ($pb) {
                     return ($pb->sell_sum_qty ?? 0) * $pb->price;
                 });
-                
+
                 return [
                     'id' => $branch->id,
                     'name' => $branch->name,
@@ -170,10 +170,10 @@ class HomeController extends Controller
     {
         $monthlyStartService = app(MonthlyStartService::class);
         $exists = $monthlyStartService->monthlyStartsExist($currentMonth);
-        
+
         $mainStartsCount = Start_Inventory::where('month', $currentMonth . '-01')->count();
         $branchStartsCount = Start::where('month', $currentMonth . '-01')->count();
-        
+
         return [
             'exists' => $exists,
             'main_starts_count' => $mainStartsCount,
@@ -186,7 +186,7 @@ class HomeController extends Controller
     {
         $mainInventoryValue = Product::sum(DB::raw('stock * price'));
         $branchInventoryValue = Product_branch::sum(DB::raw('qty * price'));
-        
+
         return $mainInventoryValue + $branchInventoryValue;
     }
 }
