@@ -29,14 +29,14 @@ class HomeController extends Controller
         $products = Product::withSum(
             [
                 'product_added' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                    $q->whereBetween('product_added.created_at', [$currentMonthStart, $currentMonthEnd]);
+                    $q->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd]);
                 }
             ],
             'qty'
         )->withSum(
             [
                 'sell' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                    $q->whereRaw('sells.created_at BETWEEN ? AND ?', [$currentMonthStart, $currentMonthEnd]);
+                    $q->whereRaw('created_at BETWEEN ? AND ?', [$currentMonthStart, $currentMonthEnd]);
                 }
             ],
             'qty'
@@ -44,7 +44,7 @@ class HomeController extends Controller
 
         $branches = Branch::with(['product_branches' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
             $q->with('product')->withSum(['product_added' => function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                $q->whereBetween('product_added.created_at', [$currentMonthStart, $currentMonthEnd]);
+                $q->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd]);
             }], 'qty');
         }])->get();
 
