@@ -22,25 +22,40 @@ class StartInventoryController extends Controller
     }
     public function store(Request $request)
     {
-        foreach ($request->start as $index => $start) {
-            if ($start == null) {
-                $start = 0;
+        DB::beginTransaction();
+        
+        try {
+            $currentMonth = date('Y-m') . '-01';
+            $updatedCount = 0;
+            
+            foreach ($request->start as $index => $start) {
+                // Ensure start quantity is not null
+                if ($start == null) {
+                    $start = 0;
+                }
+                
+                // Always update or create the start record - never skip
+                Start_Inventory::updateOrCreate(
+                    [
+                        'product_id' => $request->product_id[$index],
+                        'month' => $currentMonth,
+                    ],
+                    [
+                        'qty' => $start,
+                    ]
+                );
+                
+                $updatedCount++;
             }
-            $start_row = Start_Inventory::where('product_id', $request->product_id[$index])->where('month', date('Y-m') . '-01')->first();
-            if (empty($start_row)   ) {
-                Start_Inventory::create([
-                    'product_id' => $request->product_id[$index],
-                    'month' => date('Y-m') . '-01',
-                    'qty' => $start,
-                ]);
-            } else {
-                $start_row->update([
-                    'qty' => $start,
-                    'month' => date('Y-m') . '-01',
-                ]);
-            }
+            
+            DB::commit();
+            
+            return redirect()->route('product inventory')->with('success', "تم تعديل بداية المدة بنجاح. تم تحديث {$updatedCount} منتج.");
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->route('product inventory')->with('error', 'حدث خطأ أثناء تعديل بداية المدة: ' . $e->getMessage());
         }
-        return redirect()->route('product inventory')->with('success', 'تم تعديل بداية المدة بنجاح.');
     }
     public function qty_store()
     {
