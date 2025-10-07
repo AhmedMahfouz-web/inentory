@@ -59,26 +59,50 @@ class StartInventoryController extends Controller
     }
     public function qty_store()
     {
+        DB::beginTransaction();
+        
         try {
+            $currentMonth = date('Y-m') . '-01';
             $products = Product::all();
             $processed = 0;
+            $created = 0;
             
             foreach ($products as $product) {
-                $product_start = Start_Inventory::where('product_id', $product->id)
-                    ->where('month', date('Y-m') . '-01')
-                    ->first();
-                    
-                if (!empty($product_start)) {
-                    $product->update([
-                        'stock' => $product_start->qty,
-                    ]);
-                    $processed++;
+                // First, ensure start record exists - create it automatically if it doesn't
+                $product_start = Start_Inventory::updateOrCreate(
+                    [
+                        'product_id' => $product->id,
+                        'month' => $currentMonth,
+                    ],
+                    [
+                        'qty' => $product->stock ?? 0, // Use current stock as default if no start exists
+                    ]
+                );
+                
+                // Check if this was a newly created record
+                if ($product_start->wasRecentlyCreated) {
+                    $created++;
                 }
+                
+                // Update product stock with the start quantity
+                $product->update([
+                    'stock' => $product_start->qty,
+                ]);
+                
+                $processed++;
             }
             
-            return redirect()->route('product inventory')->with('success', "تم تعديل بداية المدة بنجاح. تم معالجة {$processed} منتج.");
+            DB::commit();
+            
+            $message = "تم تعديل بداية المدة بنجاح. تم معالجة {$processed} منتج.";
+            if ($created > 0) {
+                $message .= " تم إنشاء {$created} بداية جديدة تلقائياً.";
+            }
+            
+            return redirect()->route('product inventory')->with('success', $message);
             
         } catch (\Exception $e) {
+            DB::rollback();
             return redirect()->route('product inventory')->with('error', 'حدث خطأ أثناء تعديل بداية المدة: ' . $e->getMessage());
         }
     }
