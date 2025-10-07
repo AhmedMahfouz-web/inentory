@@ -134,61 +134,76 @@ class MonthlyStartService
     }
 
     /**
-     * Calculate ending quantity for main inventory product
+     * Calculate ending quantity for main inventory product - matches Product::qty() logic exactly
      */
     private function calculateMainInventoryEndingQty($product, $month)
     {
-        $monthStart = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-        $monthEnd = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        // Use same date filtering as Product::qty() method - whereDate with range
+        $monthStart = $month . '-01';
+        $monthEnd = $month . '-31';
         
-        // Get start quantity for the month
-        $startQty = Start_Inventory::where('product_id', $product->id)
-            ->where('month', $monthStart->format('Y-m-d'))
-            ->value('qty') ?? 0;
+        // Get added quantities - same as Product::qty()
+        $addedQty = $product->product_added()
+            ->whereDate('created_at', '>=', $monthStart)
+            ->whereDate('created_at', '<=', $monthEnd)
+            ->sum('qty');
         
-        // Get added quantities
-        $addedQty = DB::table('product_addeds')
-            ->where('product_id', $product->id)
-            ->whereBetween('created_at', [$monthStart, $monthEnd])
-            ->sum('qty') ?? 0;
+        // Get start record - same as Product::qty()
+        $startRecord = $product->start()
+            ->whereDate('month', $monthStart)
+            ->first();
         
-        // Get sold quantities (aggregate from all branches)
-        $soldQty = DB::table('sells')
-            ->join('product_branches', 'sells.product_branch_id', '=', 'product_branches.id')
-            ->where('product_branches.product_id', $product->id)
-            ->whereBetween('sells.created_at', [$monthStart, $monthEnd])
-            ->sum('sells.qty') ?? 0;
+        // Get sold quantities - same as Product::qty()
+        $soldQty = $product->sell()
+            ->whereDate('created_at', '>=', $monthStart)
+            ->whereDate('created_at', '<=', $monthEnd)
+            ->sum('qty');
         
-        return max(0, $startQty + $addedQty - $soldQty);
+        // Calculate total exactly like Product::qty() method
+        if (empty($startRecord)) {
+            $total = $addedQty - $soldQty;
+        } else {
+            $total = $startRecord->qty + $addedQty - $soldQty;
+        }
+        
+        return $total;
     }
 
     /**
-     * Calculate ending quantity for branch inventory product
+     * Calculate ending quantity for branch inventory product - matches Product_branch::qty() logic exactly
      */
     private function calculateBranchInventoryEndingQty($productBranch, $month)
     {
-        $monthStart = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-        $monthEnd = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        // Use same date filtering as Product_branch::qty() method - whereDate with range
+        $monthStart = $month . '-01';
+        $monthEnd = $month . '-31';
         
-        // Get start quantity for the month
-        $startQty = Start::where('product_branch_id', $productBranch->id)
-            ->where('month', $monthStart->format('Y-m-d'))
-            ->value('qty') ?? 0;
-        
-        // Get added quantities for this specific branch
-        $addedQty = DB::table('product_addeds')
-            ->where('product_id', $productBranch->product_id)
+        // Get added quantities for this specific branch - same as Product_branch::qty()
+        $addedQty = $productBranch->product_added()
+            ->whereDate('created_at', '>=', $monthStart)
+            ->whereDate('created_at', '<=', $monthEnd)
             ->where('branch_id', $productBranch->branch_id)
-            ->whereBetween('created_at', [$monthStart, $monthEnd])
-            ->sum('qty') ?? 0;
+            ->sum('qty');
         
-        // Get sold quantities for this specific product-branch
-        $soldQty = DB::table('sells')
-            ->where('product_branch_id', $productBranch->id)
-            ->whereBetween('created_at', [$monthStart, $monthEnd])
-            ->sum('qty') ?? 0;
+        // Get start record - same as Product_branch::qty()
+        $startRecord = $productBranch->start()
+            ->whereDate('month', $monthStart)
+            ->first();
         
-        return max(0, $startQty + $addedQty - $soldQty);
+        // Get sold quantities - same as Product_branch::qty()
+        $soldQty = $productBranch->sell()
+            ->whereDate('created_at', '>=', $monthStart)
+            ->whereDate('created_at', '<=', $monthEnd)
+            ->sum('qty');
+        
+        // Calculate total exactly like Product_branch::qty() method
+        if (empty($startRecord)) {
+            $total = $addedQty - $soldQty;
+        } else {
+            $total = $startRecord->qty + $addedQty - $soldQty;
+        }
+        
+        return $total;
     }
 
     /**
