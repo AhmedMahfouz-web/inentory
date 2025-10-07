@@ -136,76 +136,21 @@ class MonthlyStartService
     }
 
     /**
-     * Calculate ending quantity for main inventory product - matches Product::qty() logic exactly
+     * Calculate ending quantity for main inventory product - uses Product::qty() method directly
      */
     private function calculateMainInventoryEndingQty($product, $month)
     {
-        // Use same date filtering as Product::qty() method - whereDate with range
-        $monthStart = $month . '-01';
-        $monthEnd = $month . '-31';
-        
-        // Get added quantities - same as Product::qty()
-        $addedQty = $product->product_added()
-            ->whereDate('created_at', '>=', $monthStart)
-            ->whereDate('created_at', '<=', $monthEnd)
-            ->sum('qty');
-        
-        // Get start record - same as Product::qty()
-        $startRecord = $product->start()
-            ->whereDate('month', $monthStart)
-            ->first();
-        
-        // Get sold quantities - same as Product::qty()
-        $soldQty = $product->sell()
-            ->whereDate('created_at', '>=', $monthStart)
-            ->whereDate('created_at', '<=', $monthEnd)
-            ->sum('qty');
-        
-        // Calculate total exactly like Product::qty() method
-        if (empty($startRecord)) {
-            $total = $addedQty - $soldQty;
-        } else {
-            $total = $startRecord->qty + $addedQty - $soldQty;
-        }
-        
-        return $total;
+        // Use the Product model's qty() method directly - it already has the correct logic
+        return $product->qty($month);
     }
 
     /**
-     * Calculate ending quantity for branch inventory product - matches Product_branch::qty() logic exactly
+     * Calculate ending quantity for branch inventory product - uses Product_branch::qty() method directly
      */
     private function calculateBranchInventoryEndingQty($productBranch, $month)
     {
-        // Use same date filtering as Product_branch::qty() method - whereDate with range
-        $monthStart = $month . '-01';
-        $monthEnd = $month . '-31';
-        
-        // Get added quantities for this specific branch - same as Product_branch::qty()
-        $addedQty = $productBranch->product_added()
-            ->whereDate('created_at', '>=', $monthStart)
-            ->whereDate('created_at', '<=', $monthEnd)
-            ->where('branch_id', $productBranch->branch_id)
-            ->sum('qty');
-        
-        // Get start record - same as Product_branch::qty()
-        $startRecord = $productBranch->start()
-            ->whereDate('month', $monthStart)
-            ->first();
-        
-        // Get sold quantities - same as Product_branch::qty()
-        $soldQty = $productBranch->sell()
-            ->whereDate('created_at', '>=', $monthStart)
-            ->whereDate('created_at', '<=', $monthEnd)
-            ->sum('qty');
-        
-        // Calculate total exactly like Product_branch::qty() method
-        if (empty($startRecord)) {
-            $total = $addedQty - $soldQty;
-        } else {
-            $total = $startRecord->qty + $addedQty - $soldQty;
-        }
-        
-        return $total;
+        // Use the Product_branch model's qty() method directly - it already has the correct logic
+        return $productBranch->qty($month, $productBranch->branch_id);
     }
 
     /**
