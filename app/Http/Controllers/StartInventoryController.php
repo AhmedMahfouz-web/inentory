@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Start_Inventory;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -108,26 +109,90 @@ class StartInventoryController extends Controller
     }
 
     /**
-     * Auto-generate main inventory starts using MySQL stored procedure
+     * Auto-generate main inventory starts - always updates existing records
      */
     public function auto_generate()
     {
+        DB::beginTransaction();
+        
         try {
-            $targetMonth = date('Y-m') . '-01';
+            $currentMonth = date('Y-m') . '-01';
+            $previousMonth = Carbon::createFromFormat('Y-m-d', $currentMonth)->subMonth()->format('Y-m');
             
-            // Call MySQL stored procedure for better performance
-            DB::statement('CALL GenerateMainInventoryStarts(?)', [$targetMonth]);
+            $products = Product::all();
+            $processed = 0;
+            $created = 0;
+            $updated = 0;
             
-            // Get summary using MySQL function
-            $summary = DB::select('SELECT GetMonthlyInventorySummary(?) as summary', [$targetMonth]);
-            $summaryData = json_decode($summary[0]->summary, true);
+            foreach ($products as $product) {
+                // Calculate ending quantity from previous month
+                $endingQty = $this->calculateMainInventoryEndingQty($product, $previousMonth);
+                
+                // Always update or create the start record - never skip
+                $startRecord = Start_Inventory::updateOrCreate(
+                    [
+                        'product_id' => $product->id,
+                        'month' => $currentMonth,
+                    ],
+                    [
+                        'qty' => $endingQty,
+                    ]
+                );
+                
+                // Track if this was created or updated
+                if ($startRecord->wasRecentlyCreated) {
+                    $created++;
+                } else {
+                    $updated++;
+                }
+                
+                $processed++;
+            }
             
-            $mainCount = $summaryData['main_inventory']['count'] ?? 0;
+            DB::commit();
             
-            return redirect()->route('product inventory')->with('success', "تم إنشاء بداية المدة تلقائياً. تم معالجة {$mainCount} منتج.");
+            $message = "تم إنشاء بداية المدة تلقائياً. تم معالجة {$processed} منتج.";
+            if ($created > 0) {
+                $message .= " تم إنشاء {$created} بداية جديدة.";
+            }
+            if ($updated > 0) {
+                $message .= " تم تحديث {$updated} بداية موجودة.";
+            }
+            
+            return redirect()->route('product inventory')->with('success', $message);
             
         } catch (\Exception $e) {
+            DB::rollback();
             return redirect()->route('product inventory')->with('error', 'حدث خطأ أثناء إنشاء بداية المدة: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * Calculate ending quantity for main inventory product
+     */
+    private function calculateMainInventoryEndingQty($product, $month)
+    {
+        $monthStart = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $monthEnd = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        
+        // Get start quantity for the month
+        $startQty = Start_Inventory::where('product_id', $product->id)
+            ->where('month', $monthStart->format('Y-m-d'))
+            ->value('qty') ?? 0;
+        
+        // Get added quantities
+        $addedQty = DB::table('product_addeds')
+            ->where('product_id', $product->id)
+            ->whereBetween('created_at', [$monthStart, $monthEnd])
+            ->sum('qty') ?? 0;
+        
+        // Get sold quantities (aggregate from all branches)
+        $soldQty = DB::table('sells')
+            ->join('product_branches', 'sells.product_branch_id', '=', 'product_branches.id')
+            ->where('product_branches.product_id', $product->id)
+            ->whereBetween('sells.created_at', [$monthStart, $monthEnd])
+            ->sum('sells.qty') ?? 0;
+        
+        return max(0, $startQty + $addedQty - $soldQty);
     }
 }

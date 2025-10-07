@@ -69,12 +69,14 @@ class StartController extends Controller
             $date = Carbon::now()->subMonth()->year . '-' . Carbon::now()->subMonth()->month;
             $products = Product_branch::all();
             $processed = 0;
+            $created = 0;
+            $updated = 0;
             
             foreach ($products as $product) {
                 $qty = $product->qty($date, $product->branch_id);
                 
-                // Use updateOrCreate to avoid duplicates
-                Start::updateOrCreate(
+                // Always update or create the start record - never skip
+                $startRecord = Start::updateOrCreate(
                     [
                         'product_branch_id' => $product->id,
                         'month' => date('Y-m') . '-01',
@@ -82,12 +84,27 @@ class StartController extends Controller
                     ['qty' => $qty]
                 );
                 
+                // Track if this was created or updated
+                if ($startRecord->wasRecentlyCreated) {
+                    $created++;
+                } else {
+                    $updated++;
+                }
+                
                 $processed++;
             }
             
             DB::commit();
 
-            return redirect()->route('home')->with('success', "تم تعديل بداية المدة بنجاح. تم معالجة {$processed} منتج.");
+            $message = "تم تعديل بداية المدة بنجاح. تم معالجة {$processed} منتج.";
+            if ($created > 0) {
+                $message .= " تم إنشاء {$created} بداية جديدة.";
+            }
+            if ($updated > 0) {
+                $message .= " تم تحديث {$updated} بداية موجودة.";
+            }
+
+            return redirect()->route('home')->with('success', $message);
             
         } catch (\Exception $e) {
             DB::rollback();
