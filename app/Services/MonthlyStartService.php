@@ -60,7 +60,7 @@ class MonthlyStartService
     }
 
     /**
-     * Generate monthly starts for main inventory
+     * Generate monthly starts for main inventory - uses previous month ending quantities
      */
     public function generateMainInventoryStarts($month)
     {
@@ -72,6 +72,7 @@ class MonthlyStartService
         
         foreach ($products as $product) {
             try {
+                // Use previous month ending quantity as current month start (standard accounting practice)
                 $endingQty = $this->calculateMainInventoryEndingQty($product, $previousMonth);
                 
                 Start_Inventory::updateOrCreate(
@@ -97,7 +98,7 @@ class MonthlyStartService
     }
 
     /**
-     * Generate monthly starts for branch inventory
+     * Generate monthly starts for branch inventory - uses previous month ending quantities
      */
     public function generateBranchInventoryStarts($month)
     {
@@ -109,6 +110,7 @@ class MonthlyStartService
         
         foreach ($productBranches as $productBranch) {
             try {
+                // Use previous month ending quantity as current month start (standard accounting practice)
                 $endingQty = $this->calculateBranchInventoryEndingQty($productBranch, $previousMonth);
                 
                 Start::updateOrCreate(
