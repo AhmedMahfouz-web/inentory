@@ -139,14 +139,7 @@
                             <input type="text" id="basicFullname" class="form-control dt-full-name" name="name"
                                 placeholder="اسم الصنف" aria-label="اسم الصنف" aria-describedby="اسم الصنف" />
                         </div>
-                    </div>
-                    <div class="col-sm-12 mt-3">
-                        <label class="mb-2 text-light fw-semibold" for="basicFullname">كود الصنف</label>
-                        <div class="input-group input-group-merge">
-                            <span id="basicFullname2" class="input-group-text"><i class="ti ti-id"></i></span>
-                            <input type="text" id="basicFullname" class="form-control dt-full-name" name="code"
-                                placeholder="الكود" aria-label="الكود" aria-describedby="الكود" />
-                        </div>
+                        <small class="text-muted mt-1">سيتم إنشاء الكود تلقائياً</small>
                     </div>
                     <div class="col-sm-12 mt-3">
                         <label for="select2Basic" class="mb-2 text-light fw-semibold">التصنيف</label>
