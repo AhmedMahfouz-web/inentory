@@ -6,13 +6,10 @@
         <form class="card-body" method="post" action="{{ route('store product') }}">
             @csrf
             <div class="row g-3 mt-3">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <label class="mb-2 text-light fw-semibold" for="name">اسم الصنف</label>
                     <input type="text" id="name" name="name" class="form-control" placeholder="اسم الصنف" />
-                </div>
-                <div class="col-md-6">
-                    <label class="mb-2 text-light fw-semibold" for="code">الكود</label>
-                    <input type="text" id="code" name="code" class="form-control" placeholder="الكود" />
+                    <small class="text-muted">سيتم إنشاء الكود تلقائياً</small>
                 </div>
             </div>
             <div class="row g-3 mt-3">

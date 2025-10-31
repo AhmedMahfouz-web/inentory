@@ -33,12 +33,19 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'code' => 'required',
             'category' => 'required',
             'unit' => 'required',
         ]);
 
-        $category_code = SubCategory::where('id', $request->category)->select('code')->first();
+        // Auto-generate product code
+        $lastProduct = Product::orderBy('code', 'desc')->first();
+        
+        if ($lastProduct && is_numeric($lastProduct->code)) {
+            $nextCode = (int) $lastProduct->code + 1;
+        } else {
+            // If no products exist or codes are not numeric, start from 1001
+            $nextCode = 1001;
+        }
 
         $product = Product::create([
             'name' => $request->name,
@@ -46,7 +53,7 @@ class ProductController extends Controller
             'unit_id' => $request->unit,
             'min_stock' => $request->min_stock,
             'max_stock' => $request->max_stock,
-            'code' => $category_code->code . '-' . $request->code,
+            'code' => (string) $nextCode,
         ]);
 
 
