@@ -152,6 +152,25 @@ class SimplePermissionsSeeder extends Seeder
             $this->command->info("Assigned basic permissions to employee role");
         }
 
+        // Create a default admin user if none exists
+        if (\App\Models\User::where('username', 'admin')->doesntExist()) {
+            $user = \App\Models\User::create([
+                'name' => 'Super Admin',
+                'username' => 'admin',
+                'email' => 'admin@example.com',
+                'password' => 'password',
+            ]);
+            $user->assignRole('admin');
+            $this->command->info("Created default admin user with username: admin and password: password");
+        } else {
+            // If user exists, ensure they have the role
+            $user = \App\Models\User::where('username', 'admin')->first();
+            if ($user) {
+                $user->assignRole('admin');
+                $this->command->info("Assigned admin role to existing admin user");
+            }
+        }
+
         $this->command->info('Simple permissions seeder completed successfully!');
     }
 }
