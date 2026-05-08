@@ -171,6 +171,13 @@ class SimplePermissionsSeeder extends Seeder
             }
         }
 
+        // Also ensure user with ID 1 has the admin role
+        $user1 = \App\Models\User::find(1);
+        if ($user1) {
+            $user1->assignRole('admin');
+            $this->command->info("Assigned admin role to user with ID 1");
+        }
+
         $this->command->info('Simple permissions seeder completed successfully!');
     }
 }
