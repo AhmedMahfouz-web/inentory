@@ -7,6 +7,7 @@ use App\Models\ProductRequestItem;
 use App\Models\Product;
 use App\Models\Product_branch;
 use App\Models\ProductAdded;
+use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -28,7 +29,7 @@ class ProductRequestService
     public function createRequest($branchId, $items, $notes = null, $priority = 'medium')
     {
         DB::beginTransaction();
-        
+
         try {
             // Create the main request
             $request = ProductRequest::create([
@@ -43,7 +44,7 @@ class ProductRequestService
             // Create request items
             foreach ($items as $item) {
                 $product = Product::findOrFail($item['product_id']);
-                
+
                 ProductRequestItem::create([
                     'product_request_id' => $request->id,
                     'product_id' => $item['product_id'],
@@ -53,8 +54,9 @@ class ProductRequestService
                 ]);
             }
 
-            // Send notification to warehouse keepers
-            $this->notificationService->createSystemNotification(
+            // Send notification to users with approval permission
+            $this->notificationService->notifyUsersWithPermission(
+                'product-request-approve',
                 'product_request',
                 'طلب منتجات جديد',
                 "طلب جديد رقم {$request->request_number} من فرع {$request->branch->name}",
@@ -68,16 +70,15 @@ class ProductRequestService
             );
 
             DB::commit();
-            
+
             return [
                 'success' => true,
                 'request' => $request->load(['items.product', 'branch']),
                 'message' => 'تم إنشاء الطلب بنجاح'
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return [
                 'success' => false,
                 'message' => 'خطأ في إنشاء الطلب: ' . $e->getMessage()
@@ -86,13 +87,71 @@ class ProductRequestService
     }
 
     /**
+     * Update an existing product request
+     */
+    public function updateRequest($requestId, $branchId, $items, $notes = null, $priority = 'medium')
+    {
+        DB::beginTransaction();
+
+        try {
+            $request = ProductRequest::findOrFail($requestId);
+
+            // Only allow updating pending requests
+            if ($request->status !== 'pending') {
+                throw new \Exception('لا يمكن تعديل هذا الطلب');
+            }
+
+            // Update the main request
+            $request->update([
+                'branch_id' => $branchId,
+                'priority' => $priority,
+                'notes' => $notes
+            ]);
+
+            // Delete existing items
+            $request->items()->delete();
+
+            // Create new request items
+            foreach ($items as $item) {
+                $product = Product::findOrFail($item['product_id']);
+
+                ProductRequestItem::create([
+                    'product_request_id' => $request->id,
+                    'product_id' => $item['product_id'],
+                    'requested_qty' => $item['quantity'],
+                    'unit_price' => $product->price,
+                    'notes' => $item['notes'] ?? null
+                ]);
+            }
+
+            DB::commit();
+
+            return [
+                'success' => true,
+                'request' => $request->fresh(['items.product', 'branch']),
+                'message' => 'تم تحديث الطلب بنجاح'
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return [
+                'success' => false,
+                'message' => 'خطأ في تحديث الطلب: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
      * Get requests for a specific branch
      */
-    public function getBranchRequests($branchId, $status = null, $limit = 50)
+    public function getBranchRequests($branchId = null, $status = null, $limit = 100)
     {
-        $query = ProductRequest::with(['items.product.unit', 'requestedBy', 'approvedBy', 'fulfilledBy'])
-            ->byBranch($branchId)
+        $query = ProductRequest::with(['items.product.unit', 'branch', 'requestedBy', 'approvedBy', 'fulfilledBy'])
             ->orderBy('requested_at', 'desc');
+
+        if ($branchId) {
+            $query->byBranch($branchId);
+        }
 
         if ($status) {
             $query->where('status', $status);
@@ -136,10 +195,10 @@ class ProductRequestService
     public function approveRequest($requestId, $itemApprovals, $warehouseNotes = null)
     {
         DB::beginTransaction();
-        
+
         try {
             $request = ProductRequest::with('items.product')->findOrFail($requestId);
-            
+
             if (!$request->canBeApproved()) {
                 throw new \Exception('لا يمكن الموافقة على هذا الطلب');
             }
@@ -150,23 +209,60 @@ class ProductRequestService
             // Process each item approval
             foreach ($itemApprovals as $itemId => $approval) {
                 $item = $request->items()->findOrFail($itemId);
-                
+
                 if ($approval['action'] === 'approve') {
                     $approvedQty = min($approval['quantity'], $item->requested_qty);
-                    
+
                     // Check stock availability
                     if ($item->product->stock < $approvedQty) {
                         $approvedQty = $item->product->stock;
                     }
-                    
+
                     if ($approvedQty > 0) {
                         $item->approve($approvedQty, $approval['notes'] ?? null);
                         $anyApproved = true;
+
+                        // Create Order for this transfer
+                        $order = Order::create([
+                            'branch_id' => $request->branch_id,
+                            'created_at' => now(),
+                            'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
+                        ]);
+
+                        // Create ProductAdded record to transfer from inventory to branch
+                        ProductAdded::create([
+                            'branch_id' => $request->branch_id,
+                            'product_id' => $item->product_id,
+                            'qty' => $approvedQty,
+                            'price' => $item->unit_price,
+                            'order_id' => $order->id,
+                            'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
+                            'created_at' => now()
+                        ]);
+
+                        // Deduct from main inventory stock
+                        $item->product->decrement('stock', $approvedQty);
+
+                        // Add to branch inventory
+                        $productBranch = Product_branch::firstOrCreate(
+                            [
+                                'product_id' => $item->product_id,
+                                'branch_id' => $request->branch_id
+                            ],
+                            [
+                                'qty' => 0,
+                                'price' => $item->unit_price
+                            ]
+                        );
+
+                        $productBranch->increment('qty', $approvedQty);
                     } else {
                         $item->reject('المخزون غير متوفر');
                         $allApproved = false;
                     }
-                    
+
                     if ($approvedQty < $item->requested_qty) {
                         $allApproved = false;
                     }
@@ -178,7 +274,7 @@ class ProductRequestService
 
             // Update request status
             $status = $allApproved ? 'approved' : ($anyApproved ? 'partially_approved' : 'rejected');
-            
+
             $request->update([
                 'status' => $status,
                 'approved_by' => Auth::id(),
@@ -186,7 +282,7 @@ class ProductRequestService
                 'warehouse_notes' => $warehouseNotes
             ]);
 
-            // Send notification to branch
+            // Send notification to branch (only if user has permission to view requests)
             $this->notificationService->createSystemNotification(
                 'request_approved',
                 'تم الرد على طلب المنتجات',
@@ -196,20 +292,20 @@ class ProductRequestService
                     'request_number' => $request->request_number,
                     'status' => $status
                 ],
-                $request->requested_by
+                $request->requested_by,
+                'product-request-show'
             );
 
             DB::commit();
-            
+
             return [
                 'success' => true,
                 'request' => $request->fresh(['items.product', 'branch']),
-                'message' => 'تم معالجة الطلب بنجاح'
+                'message' => 'تم معالجة الطلب بنجاح وإضافة المنتجات للفرع'
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return [
                 'success' => false,
                 'message' => 'خطأ في معالجة الطلب: ' . $e->getMessage()
@@ -223,10 +319,10 @@ class ProductRequestService
     public function fulfillRequest($requestId, $fulfillmentData)
     {
         DB::beginTransaction();
-        
+
         try {
             $request = ProductRequest::with(['items.product', 'branch'])->findOrFail($requestId);
-            
+
             if (!$request->canBeFulfilled()) {
                 throw new \Exception('لا يمكن تنفيذ هذا الطلب');
             }
@@ -236,7 +332,7 @@ class ProductRequestService
             foreach ($fulfillmentData as $itemId => $fulfillment) {
                 $item = $request->items()->findOrFail($itemId);
                 $fulfilledQty = $fulfillment['quantity'];
-                
+
                 if ($fulfilledQty > 0) {
                     // Check stock availability
                     if ($item->product->stock < $fulfilledQty) {
@@ -258,7 +354,7 @@ class ProductRequestService
 
                     // Update item fulfillment
                     $item->fulfill($fulfilledQty);
-                    
+
                     if ($fulfilledQty < $item->approved_qty) {
                         $allFulfilled = false;
                     }
@@ -274,7 +370,7 @@ class ProductRequestService
                 'fulfilled_at' => now()
             ]);
 
-            // Send notification to branch
+            // Send notification to branch (only if user has permission to view requests)
             $this->notificationService->createSystemNotification(
                 'request_fulfilled',
                 'تم تنفيذ طلب المنتجات',
@@ -283,20 +379,20 @@ class ProductRequestService
                     'request_id' => $request->id,
                     'request_number' => $request->request_number
                 ],
-                $request->requested_by
+                $request->requested_by,
+                'product-request-show'
             );
 
             DB::commit();
-            
+
             return [
                 'success' => true,
                 'request' => $request->fresh(['items.product', 'branch']),
                 'message' => 'تم تنفيذ الطلب وإرسال المنتجات بنجاح'
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return [
                 'success' => false,
                 'message' => 'خطأ في تنفيذ الطلب: ' . $e->getMessage()
@@ -311,14 +407,14 @@ class ProductRequestService
     {
         try {
             $request = ProductRequest::findOrFail($requestId);
-            
+
             if (!$request->canBeCancelled()) {
                 throw new \Exception('لا يمكن إلغاء هذا الطلب');
             }
 
             $request->cancel();
 
-            // Send notification
+            // Send notification (only if user has permission to view requests)
             $this->notificationService->createSystemNotification(
                 'request_cancelled',
                 'تم إلغاء طلب المنتجات',
@@ -327,14 +423,15 @@ class ProductRequestService
                     'request_id' => $request->id,
                     'request_number' => $request->request_number,
                     'reason' => $reason
-                ]
+                ],
+                $request->requested_by,
+                'product-request-show'
             );
 
             return [
                 'success' => true,
                 'message' => 'تم إلغاء الطلب بنجاح'
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -348,7 +445,7 @@ class ProductRequestService
      */
     public function getRequestStatistics($branchId = null, $period = 'month')
     {
-        $startDate = match($period) {
+        $startDate = match ($period) {
             'day' => now()->startOfDay(),
             'week' => now()->startOfWeek(),
             'month' => now()->startOfMonth(),
@@ -357,7 +454,7 @@ class ProductRequestService
         };
 
         $query = ProductRequest::where('requested_at', '>=', $startDate);
-        
+
         if ($branchId) {
             $query->byBranch($branchId);
         }
@@ -397,7 +494,7 @@ class ProductRequestService
      */
     public function getPopularRequestedProducts($limit = 10, $period = 'month')
     {
-        $startDate = match($period) {
+        $startDate = match ($period) {
             'week' => now()->startOfWeek(),
             'month' => now()->startOfMonth(),
             'year' => now()->startOfYear(),

@@ -143,6 +143,12 @@
                                                         <i class="ti ti-eye me-1"></i>
                                                         عرض التفاصيل
                                                     </a>
+                                                    @if($request->status === 'pending' && (auth()->user()->id == $request->requested_by || auth()->user()->hasRole('admin') || auth()->user()->hasRole('manager')))
+                                                        <a class="dropdown-item" href="{{ route('product-requests.edit', $request) }}">
+                                                            <i class="ti ti-edit me-1"></i>
+                                                            تعديل الطلب
+                                                        </a>
+                                                    @endif
                                                     @if($request->canBeCancelled())
                                                         <form action="{{ route('product-requests.cancel', $request) }}" method="POST" class="d-inline">
                                                             @csrf

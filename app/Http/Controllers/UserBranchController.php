@@ -11,6 +11,11 @@ use Illuminate\View\View;
 
 class UserBranchController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['permission:user-show'], ['only' => ['index', 'show', 'update']]);
+    }
+
     /**
      * Display user-branch assignments
      */

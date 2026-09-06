@@ -24,10 +24,8 @@ class NotificationService
                 return ['success' => true, 'message' => 'لا توجد منتجات بمخزون منخفض'];
             }
 
-            // Get users who should receive notifications
-            $notificationUsers = User::whereHas('roles', function ($query) {
-                $query->whereIn('name', ['admin', 'manager', 'inventory_manager']);
-            })->get();
+            // Get users who have permission to view inventory
+            $notificationUsers = User::permission('inventory-show')->get();
 
             foreach ($notificationUsers as $user) {
                 $this->sendLowStockEmail($user, $lowStockProducts);
@@ -84,11 +82,20 @@ class NotificationService
     }
 
     /**
-     * Create system notification
+     * Create system notification with permission check
      */
-    public function createSystemNotification($type, $title, $message, $data = [], $userId = null)
+    public function createSystemNotification($type, $title, $message, $data = [], $userId = null, $requiredPermission = null)
     {
         try {
+            // If userId is provided, check if user has required permission
+            if ($userId && $requiredPermission) {
+                $user = User::find($userId);
+                if (!$user || !$user->can($requiredPermission)) {
+                    // User doesn't have permission, skip notification
+                    return null;
+                }
+            }
+
             $notification = [
                 'id' => uniqid(),
                 'type' => $type,
@@ -119,6 +126,32 @@ class NotificationService
                 'error' => $e->getMessage()
             ]);
             throw $e;
+        }
+    }
+
+    /**
+     * Send notification to all users with specific permission
+     */
+    public function notifyUsersWithPermission($permission, $type, $title, $message, $data = [])
+    {
+        try {
+            $users = User::permission($permission)->get();
+            
+            foreach ($users as $user) {
+                $this->createSystemNotification($type, $title, $message, $data, $user->id, $permission);
+            }
+
+            return [
+                'success' => true,
+                'users_notified' => $users->count()
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error notifying users with permission', [
+                'permission' => $permission,
+                'error' => $e->getMessage()
+            ]);
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
 

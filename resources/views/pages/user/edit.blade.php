@@ -16,6 +16,7 @@
         <h5 class="card-header">اضافة وحدة جديدة</h5>
         <form class="card-body" method="post" action="{{ route('update user', $user) }}">
             @csrf
+            @method('PUT')
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label" for="name">الاسم</label>
@@ -35,10 +36,9 @@
                 <div class="col-md-6 ">
                     <label class="form-label">الوظيفة :</label>
 
-                    <select form="create" class=" select2Basic select2 form-select form-select-lg" data-allow-clear="true"
-                        name="role">
+                    <select class="select2Basic select2 form-select form-select-lg" data-allow-clear="true" name="role">
                         @foreach ($roles as $role)
-                            <option {{ $user->hasRole($role->name) ? 'selected' : '' }} value="{{ $role->id }}">
+                            <option {{ $user->hasRole($role->name) ? 'selected' : '' }} value="{{ $role->name }}">
                                 {{ $role->name }}</option>
                         @endforeach
                     </select>

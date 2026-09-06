@@ -208,6 +208,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/create', 'create')->name('product-requests.create');
         Route::post('/store', 'store')->name('product-requests.store');
         Route::get('/{productRequest}', 'show')->name('product-requests.show');
+        Route::get('/{productRequest}/edit', 'edit')->name('product-requests.edit');
+        Route::put('/{productRequest}', 'update')->name('product-requests.update');
         Route::post('/{productRequest}/cancel', 'cancel')->name('product-requests.cancel');
         
         // Warehouse keeper routes

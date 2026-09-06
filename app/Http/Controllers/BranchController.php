@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class BranchController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['permission:branch-show|branch-create|branch-edit|branch-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:branch-create'], ['only' => ['create', 'store']]);
+        $this->middleware(['permission:branch-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:branch-delete'], ['only' => ['destroy']]);
+    }
+
     private function validateRequest(Request $request)
     {
         $request->validate([

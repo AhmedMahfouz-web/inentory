@@ -10,6 +10,15 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['permission:order-show|order-create|order-edit|order-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:order-create'], ['only' => ['create', 'store']]);
+        $this->middleware(['permission:order-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:order-delete'], ['only' => ['destroy']]);
+        $this->middleware(['permission:order-approve'], ['only' => ['approve']]);
+    }
+
     public function index(Request $request)
     {
         if (!empty($request->start_date)) {

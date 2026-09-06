@@ -33,11 +33,39 @@ class ProductRequestController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
         $branchId = $request->get('branch_id');
         $status = $request->get('status');
         
-        $requests = $this->productRequestService->getBranchRequests($branchId, $status);
+        // Get user's accessible branches
         $branches = Branch::all();
+        
+        // If user is not admin/manager, filter by their assigned branches
+        if (!$user->hasRole('admin') && !$user->hasRole('manager')) {
+            $userBranchIds = \App\Models\UserBranch::where('user_id', $user->id)
+                                                    ->pluck('branch_id')
+                                                    ->toArray();
+            
+            // Filter branches dropdown
+            $branches = Branch::whereIn('id', $userBranchIds)->get();
+            
+            // If no branch filter selected, default to user's branches
+            if (!$branchId && !empty($userBranchIds)) {
+                $requests = ProductRequest::with(['items.product.unit', 'branch', 'requestedBy', 'approvedBy', 'fulfilledBy'])
+                    ->whereIn('branch_id', $userBranchIds)
+                    ->when($status, function($query) use ($status) {
+                        $query->where('status', $status);
+                    })
+                    ->orderBy('requested_at', 'desc')
+                    ->limit(50)
+                    ->get();
+            } else {
+                $requests = $this->productRequestService->getBranchRequests($branchId, $status);
+            }
+        } else {
+            $requests = $this->productRequestService->getBranchRequests($branchId, $status);
+        }
+        
         $statistics = $this->productRequestService->getRequestStatistics($branchId);
 
         return view('product-requests.index', compact('requests', 'branches', 'statistics', 'branchId', 'status'));
@@ -165,6 +193,94 @@ class ProductRequestController extends Controller
         $productRequest->load(['items.product.unit', 'branch', 'requestedBy', 'approvedBy', 'fulfilledBy']);
         
         return view('product-requests.show', compact('productRequest'));
+    }
+
+    /**
+     * Show edit request form
+     */
+    public function edit(ProductRequest $productRequest)
+    {
+        // Only allow editing pending requests
+        if ($productRequest->status !== 'pending') {
+            return redirect()->route('product-requests.show', $productRequest)
+                ->with('error', 'لا يمكن تعديل هذا الطلب. يمكن تعديل الطلبات في حالة الانتظار فقط.');
+        }
+
+        // Check if user owns this request or is admin/manager
+        $user = auth()->user();
+        if ($productRequest->requested_by !== $user->id && !$user->hasRole('admin') && !$user->hasRole('manager')) {
+            return redirect()->route('product-requests.show', $productRequest)
+                ->with('error', 'ليس لديك صلاحية لتعديل هذا الطلب');
+        }
+
+        // Get branches
+        $branches = \App\Models\Branch::whereHas('userBranches', function($query) use ($user) {
+            $query->where('user_id', $user->id)
+                  ->where('can_request', true);
+        })->get();
+        
+        if ($branches->isEmpty() && ($user->hasRole('admin') || $user->hasRole('manager'))) {
+            $branches = \App\Models\Branch::all();
+        }
+
+        $products = Product::with(['sub_category', 'unit'])->active()->get();
+        $productRequest->load(['items.product.unit', 'branch']);
+
+        return view('product-requests.edit', compact('productRequest', 'branches', 'products'));
+    }
+
+    /**
+     * Update product request
+     */
+    public function update(Request $request, ProductRequest $productRequest)
+    {
+        // Only allow editing pending requests
+        if ($productRequest->status !== 'pending') {
+            return redirect()->route('product-requests.show', $productRequest)
+                ->with('error', 'لا يمكن تعديل هذا الطلب. يمكن تعديل الطلبات في حالة الانتظار فقط.');
+        }
+
+        // Check if user owns this request or is admin/manager
+        $user = auth()->user();
+        if ($productRequest->requested_by !== $user->id && !$user->hasRole('admin') && !$user->hasRole('manager')) {
+            return redirect()->route('product-requests.show', $productRequest)
+                ->with('error', 'ليس لديك صلاحية لتعديل هذا الطلب');
+        }
+
+        $request->validate([
+            'branch_id' => 'required|exists:branches,id',
+            'priority' => 'required|in:low,medium,high,urgent',
+            'notes' => 'nullable|string|max:1000',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|numeric|min:0.01',
+            'items.*.notes' => 'nullable|string|max:500'
+        ], [
+            'branch_id.required' => 'يجب اختيار الفرع',
+            'branch_id.exists' => 'الفرع المحدد غير موجود',
+            'priority.required' => 'يجب تحديد الأولوية',
+            'items.required' => 'يجب إضافة منتج واحد على الأقل',
+            'items.min' => 'يجب إضافة منتج واحد على الأقل',
+            'items.*.product_id.required' => 'يجب اختيار المنتج',
+            'items.*.product_id.exists' => 'المنتج المحدد غير موجود',
+            'items.*.quantity.required' => 'يجب تحديد الكمية',
+            'items.*.quantity.min' => 'الكمية يجب أن تكون أكبر من صفر'
+        ]);
+
+        $result = $this->productRequestService->updateRequest(
+            $productRequest->id,
+            $request->branch_id,
+            $request->items,
+            $request->notes,
+            $request->priority
+        );
+
+        if ($result['success']) {
+            return redirect()->route('product-requests.show', $productRequest->id)
+                ->with('success', $result['message']);
+        } else {
+            return back()->withInput()->with('error', $result['message']);
+        }
     }
 
     /**

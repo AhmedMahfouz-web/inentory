@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 
 class SubCategoryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['permission:category-show|category-create|category-edit|category-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:category-create'], ['only' => ['create', 'store']]);
+        $this->middleware(['permission:category-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:category-delete'], ['only' => ['destroy']]);
+    }
+
     public function index()
     {
         $categories = SubCategory::with('category')->get();

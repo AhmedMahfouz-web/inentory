@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class IncreasedProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['permission:increase-show|increase-create|increase-edit|increase-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:increase-create'], ['only' => ['create', 'store']]);
+        $this->middleware(['permission:increase-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:increase-delete'], ['only' => ['destroy']]);
+    }
+
     public function index(Request $request)
     {
         if (!empty($request->start_date)) {

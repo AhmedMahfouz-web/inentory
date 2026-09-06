@@ -14,19 +14,21 @@
 
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
+        @can('dashboard-show')
         <li class="menu-item {{ Request::is('/') ? 'active open' : '' }}">
             <a href="{{ route('home') }}" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-smart-home"></i>
                 <div data-i18n="الرئيسية">الرئيسية</div>
             </a>
         </li>
+        @endcan
 
         <!-- Actions -->
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text">الحركات</span>
         </li>
 
-        @can('order_show')
+        @can('order-show')
             <li class="menu-item {{ Request::is('order/*', 'order') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-clipboard-text"></i>
@@ -42,7 +44,7 @@
             </li>
         @endcan
 
-        @can('product_added-show')
+        @can('exchange-show')
             <li class="menu-item {{ Request::is('product_exchange/*', 'product_exchange') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-transfer-out"></i>
@@ -54,7 +56,7 @@
                             <div data-i18n="عرض التحويلات">عرض التحويلات</div>
                         </a>
                     </li>
-                    @can('product_added-create')
+                    @can('exchange-create')
                         <li class="menu-item {{ Request::is('product_exchange/create') ? 'active' : '' }}">
                             <a href="{{ route('create exchange product') }}" class="menu-link">
                                 <div data-i18n="تحويل اصناف">تحويل اصناف</div>
@@ -66,7 +68,7 @@
         @endcan
 
 
-        @can('product_increased-show')
+        @can('increase-show')
             <li class="menu-item {{ Request::is('product_increase/*', 'product_increase') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-transfer-in"></i>
@@ -78,7 +80,7 @@
                             <div data-i18n="عرض الاضافات">عرض الاضافات</div>
                         </a>
                     </li>
-                    @can('product_increased-create')
+                    @can('increase-create')
                         <li class="menu-item {{ Request::is('product_increase/create') ? 'active' : '' }}">
                             <a href="{{ route('create increase product') }}" class="menu-link">
                                 <div data-i18n="اضافة اصناف">اضافة اصناف</div>
@@ -89,7 +91,7 @@
             </li>
         @endcan
 
-        @can('product_branch-show')
+        @can('inventory-show')
             <!-- Inventory -->
             <li class="menu-header small text-uppercase">
                 <span class="menu-header-text">المخزون</span>
@@ -252,7 +254,7 @@
             </li>
         @endcan
 
-        @can('sub_category-show')
+        @can('category-show')
             <li class="menu-item {{ Request::is('sub_category/*', 'sub_category') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon ti ti-category-2"></i>
@@ -264,7 +266,7 @@
                             <div data-i18n="عرض التصنيفات">عرض التصنيفات</div>
                         </a>
                     </li>
-                    @can('sub_category-create')
+                    @can('category-create')
                         <li class="menu-item {{ Request::is('sub_category/create') ? 'active' : '' }}">
                             <a href="{{ route('create sub_category') }}" class="menu-link">
                                 <div data-i18n="اضافة تصنيف">اضافة تصنيف</div>
@@ -321,7 +323,7 @@
             </li>
         @endcan
 
-        @can('role-list')
+        @can('role-show')
             <li class="menu-item {{ Request::is('roles/*', 'roles') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon ti ti-briefcase"></i>
@@ -345,7 +347,7 @@
         @endcan
 
         <!-- User-Branch Management -->
-        @can('user-branch-show')
+        @can('user-show')
             <li class="menu-item {{ Request::is('user-branches/*', 'user-branches') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon ti ti-users-group"></i>

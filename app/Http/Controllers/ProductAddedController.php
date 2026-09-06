@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\DB;
 
 class ProductAddedController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['permission:exchange-show|exchange-create|exchange-edit|exchange-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:exchange-create'], ['only' => ['create', 'store']]);
+        $this->middleware(['permission:exchange-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:exchange-delete'], ['only' => ['destroy']]);
+    }
+
     public function index(Request $request)
     {
         if (!empty($request->branch_id)) {
@@ -86,53 +94,50 @@ class ProductAddedController extends Controller
         $errors = [];
         DB::beginTransaction();
         $order = Order::create([
-            'branch_id' => $request->branch_id,
-            'created_at' => $request->created_at,
-            'created_by' => auth()->user()->name
+            'branch_id' => $request->branch_id
         ]);
         $order_id = $order->id;
-        foreach ($request->product as $product_added) {
-            if (!empty($product_added['product_id'])) {
-                // if ($product_added['product_id'] != null && $product_added['qty'] != null && $product_added['qty'] != 0) {
-                if ($product_added['product_id']) {
-                    if ($product_added['qty'] == null) {
-                        $qty = 0;
-                    } else {
-                        $qty = $product_added['qty'];
-                    }
-                    $product = Product::where('id', $product_added['product_id'])->first();
-                    // if ($product->stock < $product_added['qty']) {
-                    // $errors = "مخزون الـ" . $product->name . ' اقل من الكمية المنصرفة';
-                    // } else {
-                    $product_on_branch = Product_branch::where(['product_id' => $product_added['product_id'], 'branch_id' => $request['branch_id']])->first();
-                    if (!empty($product_on_branch)) {
-                        $product_on_branch->update(['price' => $product->price]);
-                        $product_on_branch->increment('qty', $qty);
-                    } else {
-                        Product_branch::create([
+            
+            foreach ($request->product as $product_added) {
+                if (!empty($product_added['product_id'])) {
+                    if ($product_added['product_id']) {
+                        if ($product_added['qty'] == null) {
+                            $qty = 0;
+                        } else {
+                            $qty = $product_added['qty'];
+                        }
+                        $product = Product::where('id', $product_added['product_id'])->first();
+                        
+                        $product_on_branch = Product_branch::where(['product_id' => $product_added['product_id'], 'branch_id' => $request['branch_id']])->first();
+                        if (!empty($product_on_branch)) {
+                            $product_on_branch->update(['price' => $product->price]);
+                            $product_on_branch->increment('qty', $qty);
+                        } else {
+                            Product_branch::create([
+                                'product_id' => $product_added['product_id'],
+                                'branch_id' => $request->branch_id,
+                                'qty' => $qty,
+                                'price' => $product->price,
+                                'created_at' => $request->created_at,
+                                'created_by' => auth()->user()->id,
+                                'updated_by' => auth()->user()->id
+                            ]);
+                        }
+                        productAdded::create([
                             'product_id' => $product_added['product_id'],
+                            'price' => $product->price,
                             'branch_id' => $request->branch_id,
                             'qty' => $qty,
-                            'price' => $product->price,
+                            'order_id' => $order_id,
                             'created_at' => $request->created_at,
-                            'created_by' => auth()->user()->name
+                            'created_by' => auth()->user()->id,
+                            'updated_by' => auth()->user()->id
                         ]);
+                        if ($product->stock > $product_added['qty']) {
+                            $product->decrement('stock', $qty);
+                        }
                     }
-                    productAdded::create([
-                        'product_id' => $product_added['product_id'],
-                        'price' => $product->price,
-                        'branch_id' => $request->branch_id,
-                        'qty' => $qty,
-                        'order_id' => $order_id,
-                        'created_at' => $request->created_at,
-                        'created_by' => auth()->user()->name
-                    ]);
-                    if ($product->stock > $product_added['qty']) {
-                        $product->decrement('stock', $qty);
-                    }
-                    // }
                 }
-            }
         }
         DB::commit();
 
@@ -144,8 +149,7 @@ class ProductAddedController extends Controller
         $errors = [];
         DB::beginTransaction();
         $order = Order::create([
-            'branch_id' => $request->branch_id,
-            'created_at' => $request->created_at
+            'branch_id' => $request->branch_id
         ]);
         $order_id = $order->id;
         foreach ($request->product as $product_added) {

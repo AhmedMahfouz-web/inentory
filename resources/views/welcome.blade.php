@@ -86,8 +86,10 @@
 @endsection
 
 @section('content')
+    @can('dashboard-show')
     <!-- Enhanced Statistics Cards -->
     <div class="row mb-4">
+        @can('product-show')
         <div class="col-lg-2 col-6 mb-4">
             <div class="card">
                 <div class="card-body text-center">
@@ -100,7 +102,9 @@
                 </div>
             </div>
         </div>
+        @endcan
 
+        @can('branch-show')
         <div class="col-lg-2 col-6 mb-4">
             <div class="card">
                 <div class="card-body text-center">
@@ -113,7 +117,9 @@
                 </div>
             </div>
         </div>
+        @endcan
 
+        @can('inventory-show')
         <div class="col-lg-2 col-6 mb-4">
             <div class="card">
                 <div class="card-body text-center">
@@ -126,7 +132,9 @@
                 </div>
             </div>
         </div>
+        @endcan
 
+        @can('inventory-show')
         <div class="col-lg-2 col-6 mb-4">
             <div class="card">
                 <div class="card-body text-center">
@@ -139,7 +147,9 @@
                 </div>
             </div>
         </div>
+        @endcan
 
+        @can('sell-show')
         <div class="col-lg-2 col-6 mb-4">
             <div class="card">
                 <div class="card-body text-center">
@@ -152,7 +162,9 @@
                 </div>
             </div>
         </div>
+        @endcan
 
+        @can('inventory-show')
         <div class="col-lg-2 col-6 mb-4">
             <div class="card">
                 <div class="card-body text-center">
@@ -165,9 +177,11 @@
                 </div>
             </div>
         </div>
+        @endcan
     </div>
 
     <!-- Monthly Starts Status -->
+    @can('start-show')
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
@@ -214,12 +228,14 @@
             </div>
         </div>
     </div>
+    @endcan
 
     <!-- Quick Access (Existing Content Enhanced) -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <h5 class="card-header">الوصول السريع</h5>
+                @can('inventory-show')
                 <div class="card-body">
                     <small class="text-light fw-semibold">المخازن</small>
                     <div class="demo-inline-spacing">
@@ -232,22 +248,36 @@
                     </div>
                 </div>
                 <hr class="m-0" />
+                @endcan
+                @can('order-show|exchange-show|increase-show')
                 <div class="card-body">
                     <small class="text-light fw-semibold">الحركات</small>
                     <div class="demo-inline-spacing">
+                        @can('order-show')
                         <a href="{{ route('show order') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon tf-icons ti ti-clipboard-text"></i> اذون الصرف</a>
+                        @endcan
+                        @can('exchange-create')
                         <a href="{{ route('create exchange product') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon tf-icons ti ti-transfer-out"></i> تحويل</a>
+                        @endcan
+                        @can('exchange-show')
                         <a href="{{ route('exchanged product') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon tf-icons ti ti-transfer-out"></i> عرض التحويلات</a>
+                        @endcan
+                        @can('increase-create')
                         <a href="{{ route('create increase product') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon tf-icons ti ti-transfer-in"></i> اضافة</a>
+                        @endcan
+                        @can('increase-show')
                         <a href="{{ route('increased product') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon tf-icons ti ti-transfer-in"></i> عرض الاضافات</a>
+                        @endcan
                     </div>
                 </div>
                 <hr class="m-0" />
+                @endcan
+                @can('start-show')
                 <div class="card-body">
                     <small class="text-light fw-semibold">بداية الشهر</small>
                     <div class="demo-inline-spacing">
@@ -260,23 +290,36 @@
                     </div>
                 </div>
                 <hr class="m-0" />
+                @endcan
+                @can('supplier-show|branch-show|product-show|category-show|unit-show')
                 <div class="card-body">
                     <small class="text-light fw-semibold">الاعدادات</small>
                     <div class="demo-inline-spacing">
+                        @can('supplier-show')
                         <a href="{{ route('show suppliers') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon tf-icons ti ti-truck-delivery"></i> الموردون</a>
+                        @endcan
+                        @can('branch-show')
                         <a href="{{ route('show branches') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon tf-icons ti ti-building-warehouse"></i> المخازن الفرعية</a>
+                        @endcan
+                        @can('product-show')
                         <a href="{{ route('show products') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon ti ti-box"></i> الاصناف</a>
+                        @endcan
+                        @can('category-show')
                         <a href="{{ route('show categories') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon ti ti-category"></i> الاقسام</a>
                         <a href="{{ route('show sub_categories') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon ti ti-category-2"></i> التصنيفات</a>
+                        @endcan
+                        @can('unit-show')
                         <a href="{{ route('show units') }}" class="btn rounded-pill btn-outline-primary"><i
                                 class="menu-icon ti ti-weight"></i> الوحدات</a>
+                        @endcan
                     </div>
                 </div>
+                @endcan
             </div>
         </div>
     </div>
@@ -284,6 +327,7 @@
     <!-- Branch Performance & Low Stock Alerts -->
     <div class="row mb-4">
         <!-- Branch Performance -->
+        @can('branch-show')
         <div class="col-lg-8 mb-4">
             <div class="card h-100">
                 <div class="card-header">
@@ -328,8 +372,10 @@
                 </div>
             </div>
         </div>
+        @endcan
 
         <!-- Low Stock Alerts -->
+        @can('product-show')
         <div class="col-lg-4 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -366,9 +412,11 @@
                 </div>
             </div>
         </div>
+        @endcan
     </div>
 
     <!-- Recent Activity -->
+    @can('inventory-show')
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -405,4 +453,6 @@
             </div>
         </div>
     </div>
+    @endcan
+    @endcan
 @endsection
