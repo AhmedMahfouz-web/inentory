@@ -14,10 +14,10 @@ class ProductAddedController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['permission:exchange-show|exchange-create|exchange-edit|exchange-delete'], ['only' => ['index', 'show']]);
-        $this->middleware(['permission:exchange-create'], ['only' => ['create', 'store', 'checkStock']]);
-        $this->middleware(['permission:exchange-edit'], ['only' => ['edit', 'update']]);
-        $this->middleware(['permission:exchange-delete'], ['only' => ['destroy']]);
+        $this->middleware(['permission:exchange-show|exchange-create|exchange-edit|exchange-delete|product_added-show|product_added-create|product_added-edit|product_added-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:exchange-create|product_added-create'], ['only' => ['create', 'store', 'checkStock']]);
+        $this->middleware(['permission:exchange-edit|product_added-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:exchange-delete|product_added-delete'], ['only' => ['destroy']]);
     }
 
     public function index(Request $request)

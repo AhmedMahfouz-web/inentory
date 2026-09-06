@@ -10,7 +10,7 @@ class ProductBranchController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['permission:inventory-show'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:inventory-show|product_branch-show'], ['only' => ['index', 'show']]);
     }
 
     public function index(Branch $branch_id, Request $request)

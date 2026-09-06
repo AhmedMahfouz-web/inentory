@@ -28,7 +28,7 @@
             <span class="menu-header-text">الحركات</span>
         </li>
 
-        @can('order-show')
+        @if(auth()->user()->can('order-show') || auth()->user()->can('order_show'))
             <li class="menu-item {{ Request::is('order/*', 'order') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-clipboard-text"></i>
@@ -42,9 +42,9 @@
                     </li>
                 </ul>
             </li>
-        @endcan
+        @endif
 
-        @can('exchange-show')
+        @if(auth()->user()->can('exchange-show') || auth()->user()->can('product_added-show'))
             <li class="menu-item {{ Request::is('product_exchange/*', 'product_exchange') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-transfer-out"></i>
@@ -56,19 +56,19 @@
                             <div data-i18n="عرض التحويلات">عرض التحويلات</div>
                         </a>
                     </li>
-                    @can('exchange-create')
+                    @if(auth()->user()->can('exchange-create') || auth()->user()->can('product_added-create'))
                         <li class="menu-item {{ Request::is('product_exchange/create') ? 'active' : '' }}">
                             <a href="{{ route('create exchange product') }}" class="menu-link">
                                 <div data-i18n="تحويل اصناف">تحويل اصناف</div>
                             </a>
                         </li>
-                    @endcan
+                    @endif
                 </ul>
             </li>
-        @endcan
+        @endif
 
 
-        @can('increase-show')
+        @if(auth()->user()->can('increase-show') || auth()->user()->can('product_increased-show'))
             <li class="menu-item {{ Request::is('product_increase/*', 'product_increase') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-transfer-in"></i>
@@ -80,18 +80,18 @@
                             <div data-i18n="عرض الاضافات">عرض الاضافات</div>
                         </a>
                     </li>
-                    @can('increase-create')
+                    @if(auth()->user()->can('increase-create') || auth()->user()->can('product_increased-create'))
                         <li class="menu-item {{ Request::is('product_increase/create') ? 'active' : '' }}">
                             <a href="{{ route('create increase product') }}" class="menu-link">
                                 <div data-i18n="اضافة اصناف">اضافة اصناف</div>
                             </a>
                         </li>
-                    @endcan
+                    @endif
                 </ul>
             </li>
-        @endcan
+        @endif
 
-        @can('inventory-show')
+        @if(auth()->user()->can('inventory-show') || auth()->user()->can('product_branch-show'))
             <!-- Inventory -->
             <li class="menu-header small text-uppercase">
                 <span class="menu-header-text">المخزون</span>
@@ -152,7 +152,7 @@
                     </li>
                 </ul>
             </li>
-        @endcan
+        @endif
 
         <!-- Suppliers -->
         @can('supplier-show')

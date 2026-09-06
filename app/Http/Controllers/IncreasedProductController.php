@@ -13,10 +13,10 @@ class IncreasedProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['permission:increase-show|increase-create|increase-edit|increase-delete'], ['only' => ['index', 'show']]);
-        $this->middleware(['permission:increase-create'], ['only' => ['create', 'store']]);
-        $this->middleware(['permission:increase-edit'], ['only' => ['edit', 'update']]);
-        $this->middleware(['permission:increase-delete'], ['only' => ['destroy']]);
+        $this->middleware(['permission:increase-show|increase-create|increase-edit|increase-delete|product_increased-show|product_increased-create|product_increased-edit|product_increased-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:increase-create|product_increased-create'], ['only' => ['create', 'store']]);
+        $this->middleware(['permission:increase-edit|product_increased-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:increase-delete|product_increased-delete'], ['only' => ['destroy']]);
     }
 
     public function index(Request $request)
