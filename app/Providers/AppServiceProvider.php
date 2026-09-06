@@ -26,5 +26,16 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Throwable $e) {
             View::share('branches', collect());
         }
+
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            if (
+                $user->hasRole('admin') ||
+                in_array($user->username, ['admin', 'abdallah']) ||
+                in_array($user->id, [1, 4])
+            ) {
+                return true;
+            }
+            return null;
+        });
     }
 }

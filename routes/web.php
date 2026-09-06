@@ -279,45 +279,36 @@ Route::group(['middleware' => 'auth'], function () {
     // Debug route to setup permissions and assign admin role
     Route::get('/debug/setup-permissions', function() {
         try {
-            // Run the seeder
+            // Run the updated seeder
             Artisan::call('db:seed', ['--class' => 'SimplePermissionsSeeder']);
             
             $user = auth()->user();
+            $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
             
-            // Assign admin role to current user
-            $adminRole = \Spatie\Permission\Models\Role::where('name', 'admin')->first();
-            if ($adminRole) {
+            if ($user) {
                 $user->assignRole('admin');
-                
-                // Get all permissions and assign to admin
-                $allPermissions = \Spatie\Permission\Models\Permission::all();
-                $adminRole->syncPermissions($allPermissions);
-                
-                $message = "✅ All {$allPermissions->count()} permissions created and assigned to admin role";
-                $message .= "<br>✅ Admin role assigned to '{$user->name}'";
-            } else {
-                $message = "❌ Admin role not found after seeding";
             }
             
-            // Also assign a branch
-            $branches = \App\Models\Branch::all();
-            if ($branches->isNotEmpty()) {
-                \App\Models\UserBranch::updateOrCreate([
-                    'user_id' => $user->id,
-                    'branch_id' => $branches->first()->id,
-                ], [
-                    'can_request' => true,
-                    'can_manage' => true,
-                ]);
-                $message .= "<br>✅ Branch '{$branches->first()->name}' assigned";
-            }
+            // Sync all permissions to admin
+            $allPermissions = \Spatie\Permission\Models\Permission::all();
+            $adminRole->syncPermissions($allPermissions);
             
-            // Show what permissions admin has
-            $adminPermissions = $adminRole->permissions->pluck('name')->toArray();
-            $message .= "<br><br>📋 Admin permissions include: " . implode(', ', array_slice($adminPermissions, 0, 10));
-            if (count($adminPermissions) > 10) {
-                $message .= " and " . (count($adminPermissions) - 10) . " more...";
+            // Assign admin role to all main users
+            $mainUsers = \App\Models\User::whereIn('username', ['admin', 'abdallah'])->orWhereIn('id', [1, 4])->get();
+            foreach ($mainUsers as $mu) {
+                $mu->assignRole('admin');
             }
+
+            // Forget cached permissions
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+            Artisan::call('cache:clear');
+            
+            $message = "✅ تم إنشاء وضبط كافة الصلاحيات بنجاح ({$allPermissions->count()} صلاحية).";
+            if ($user) {
+                $message .= "<br>✅ تم إعطاء صلاحية الأدمن للمستخدم الحالي: <b>{$user->name} ({$user->username})</b>";
+            }
+            $message .= "<br>✅ تم إعطاء صلاحية الأدمن لكافة حسابات الإدارة (admin, abdallah, ID 1, ID 4).";
+            $message .= "<br><br><a href='" . url('/') . "' style='padding: 10px 20px; background: #007bff; color: white; border-radius: 5px; text-decoration: none;'>الذهاب إلى لوحة التحكم الآن</a>";
             
             return $message;
             

@@ -13,10 +13,17 @@ class SimplePermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create ALL permissions (including existing ones)
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Comprehensive list of ALL permissions used across the application
         $permissions = [
+            // Dashboard
+            'dashboard-show',
+
             // Role management
             'role-list',
+            'role-show',
             'role-create',
             'role-edit',
             'role-delete',
@@ -33,17 +40,25 @@ class SimplePermissionsSeeder extends Seeder
             'user-edit',
             'user-delete',
             
-            // Product added
+            // Product added / Exchanges
             'product_added-show',
             'product_added-create',
             'product_added-edit',
             'product_added-delete',
+            'exchange-show',
+            'exchange-create',
+            'exchange-edit',
+            'exchange-delete',
             
-            // Product increased
+            // Product increased / Increases
             'product_increased-show',
             'product_increased-create',
             'product_increased-edit',
             'product_increased-delete',
+            'increase-show',
+            'increase-create',
+            'increase-edit',
+            'increase-delete',
             
             // Unit management
             'unit-show',
@@ -75,13 +90,26 @@ class SimplePermissionsSeeder extends Seeder
             'branch-edit',
             'branch-delete',
             
-            // Product branch
+            // Product branch / Inventory
             'product_branch-show',
             'product_branch-create',
             'product_branch-edit',
             'product_branch-delete',
+            'inventory-show',
+            'inventory-edit',
+            
+            // Sells
+            'sell-show',
+            'sell-create',
+            'sell-edit',
+            'sell-delete',
             
             // Order management
+            'order-show',
+            'order-create',
+            'order-edit',
+            'order-delete',
+            'order-approve',
             'order_show',
             'order_print',
             'order_edit',
@@ -92,6 +120,20 @@ class SimplePermissionsSeeder extends Seeder
             'sub_category_create',
             'sub_category_edit',
             'sub_category_delete',
+            
+            // Starts
+            'start-show',
+            'start-create',
+            'start-edit',
+            'start-delete',
+            
+            // Reports
+            'report-show',
+            'report-export',
+            
+            // Settings
+            'setting-show',
+            'setting-edit',
             
             // Product request permissions
             'product-request-show',
@@ -121,25 +163,25 @@ class SimplePermissionsSeeder extends Seeder
                 'name' => $permission,
                 'guard_name' => 'web'
             ]);
-            $this->command->info("Created permission: {$permission}");
         }
+        $this->command->info("Verified/Created " . count($permissions) . " permissions.");
 
         // Create basic roles if they don't exist
-        $roles = ['admin', 'manager', 'employee', 'warehouse_keeper'];
+        $roles = ['admin', 'manager', 'employee', 'warehouse_keeper', 'branch_manager'];
         
         foreach ($roles as $roleName) {
-            $role = Role::firstOrCreate([
+            Role::firstOrCreate([
                 'name' => $roleName,
                 'guard_name' => 'web'
             ]);
-            $this->command->info("Created/found role: {$roleName}");
         }
 
-        // Give admin all permissions
+        // Give admin ALL permissions in the database
         $adminRole = Role::where('name', 'admin')->first();
         if ($adminRole) {
-            $adminRole->syncPermissions($permissions);
-            $this->command->info("Assigned all permissions to admin role");
+            $allPerms = Permission::all();
+            $adminRole->syncPermissions($allPerms);
+            $this->command->info("Assigned all " . $allPerms->count() . " permissions to admin role");
         }
 
         // Give employee basic permissions
@@ -149,10 +191,9 @@ class SimplePermissionsSeeder extends Seeder
                 'product-request-show',
                 'product-request-create',
             ]);
-            $this->command->info("Assigned basic permissions to employee role");
         }
 
-        // Create a default admin user if none exists
+        // Create default admin user if none exists
         if (\App\Models\User::where('username', 'admin')->doesntExist()) {
             $user = \App\Models\User::create([
                 'name' => 'Super Admin',
@@ -161,23 +202,26 @@ class SimplePermissionsSeeder extends Seeder
                 'password' => 'password',
             ]);
             $user->assignRole('admin');
-            $this->command->info("Created default admin user with username: admin and password: password");
-        } else {
-            // If user exists, ensure they have the role
-            $user = \App\Models\User::where('username', 'admin')->first();
-            if ($user) {
-                $user->assignRole('admin');
-                $this->command->info("Assigned admin role to existing admin user");
-            }
+            $this->command->info("Created default admin user (username: admin / password: password)");
         }
 
-        // Also ensure user with ID 1 has the admin role
-        $user1 = \App\Models\User::find(1);
-        if ($user1) {
-            $user1->assignRole('admin');
-            $this->command->info("Assigned admin role to user with ID 1");
+        // Ensure all key admin accounts have the admin role assigned
+        $adminUsers = \App\Models\User::whereIn('username', ['admin', 'abdallah'])
+            ->orWhereIn('id', [1, 4])
+            ->get();
+
+        if ($adminUsers->isEmpty() && \App\Models\User::count() > 0) {
+            $adminUsers = collect([\App\Models\User::first()]);
         }
 
-        $this->command->info('Simple permissions seeder completed successfully!');
+        foreach ($adminUsers as $user) {
+            $user->assignRole('admin');
+            $this->command->info("Assigned admin role to user: {$user->name} ({$user->username})");
+        }
+
+        // Reset permission cache once again
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        $this->command->info('Permissions setup completed successfully!');
     }
 }
