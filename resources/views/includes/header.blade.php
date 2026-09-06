@@ -125,7 +125,7 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <span class="fw-semibold d-block">{{ auth()->user()->name }}</span>
-                                    <small class="text-muted">{{ auth()->user()->roles[0]->name }}</small>
+                                    <small class="text-muted">{{ optional(auth()->user()->roles->first())->name ?? 'No Role' }}</small>
                                 </div>
                             </div>
                         </a>
