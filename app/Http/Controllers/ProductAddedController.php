@@ -15,7 +15,7 @@ class ProductAddedController extends Controller
     public function __construct()
     {
         $this->middleware(['permission:exchange-show|exchange-create|exchange-edit|exchange-delete'], ['only' => ['index', 'show']]);
-        $this->middleware(['permission:exchange-create'], ['only' => ['create', 'store']]);
+        $this->middleware(['permission:exchange-create'], ['only' => ['create', 'store', 'checkStock']]);
         $this->middleware(['permission:exchange-edit'], ['only' => ['edit', 'update']]);
         $this->middleware(['permission:exchange-delete'], ['only' => ['destroy']]);
     }
@@ -89,60 +89,160 @@ class ProductAddedController extends Controller
         return view('pages.added_product.create', compact('products', 'branches', 'qty'));
     }
 
+    /**
+     * AJAX endpoint to check available stock in main warehouse
+     */
+    public function checkStock(Request $request)
+    {
+        $date = date('Y-m');
+
+        // Check single product
+        if ($request->has('product_id')) {
+            $product = Product::find($request->product_id);
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'الصنف غير موجود'
+                ], 404);
+            }
+
+            $currentStock = (float) $product->qty($date);
+            $isAvailable = ($currentStock > 0);
+
+            return response()->json([
+                'success' => true,
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'product_code' => $product->code,
+                'current_stock' => $currentStock,
+                'is_available' => $isAvailable,
+                'message' => $isAvailable ? 'المنتج متوفر' : "الكمية في المخزن الرئيسي ({$currentStock}) غير متاحة للصرف"
+            ]);
+        }
+
+        // Check multiple products (batch)
+        if ($request->has('products') && is_array($request->products)) {
+            $items = [];
+            $hasErrors = false;
+            $errorProducts = [];
+
+            foreach ($request->products as $item) {
+                if (!empty($item['product_id'])) {
+                    $product = Product::find($item['product_id']);
+                    if ($product) {
+                        $stock = (float) $product->qty($date);
+                        $isAvailable = ($stock > 0);
+                        if (!$isAvailable) {
+                            $hasErrors = true;
+                            $errorProducts[] = "{$product->name} ({$stock})";
+                        }
+                        $items[] = [
+                            'product_id' => $product->id,
+                            'product_name' => $product->name,
+                            'product_code' => $product->code,
+                            'current_stock' => $stock,
+                            'is_available' => $isAvailable,
+                            'message' => $isAvailable ? 'متوفر' : "الكمية في المخزن الرئيسي ({$stock}) غير متاحة للصرف"
+                        ];
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'has_errors' => $hasErrors,
+                'error_products' => $errorProducts,
+                'items' => $items,
+                'message' => $hasErrors ? 'يوجد أصناف كميتها في المخزن الرئيسي غير متاحة' : 'جميع الأصناف متوفرة'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'بيانات الفحص غير مكتملة'
+        ], 400);
+    }
+
     public function store(Request $request)
     {
+        $date = date('Y-m');
+        $zeroStockProducts = [];
+
+        if (empty($request->product) || !is_array($request->product)) {
+            return redirect()->back()->withInput()->with('error', 'يجب اختيار صنف واحد على الأقل للصرف');
+        }
+
+        // Backend validation: check that every product has stock > 0
+        foreach ($request->product as $product_item) {
+            if (!empty($product_item['product_id'])) {
+                $product = Product::find($product_item['product_id']);
+                if ($product) {
+                    $currentQty = (float) $product->qty($date);
+                    if ($currentQty <= 0) {
+                        $zeroStockProducts[] = "{$product->name} (الرصيد: {$currentQty})";
+                    }
+                }
+            }
+        }
+
+        if (!empty($zeroStockProducts)) {
+            return redirect()->back()->withInput()->with('error', 'لا يمكن إتمام الصرف لأن الأصناف التالية رصيدها في المخزن الرئيسي غير متاح: ' . implode('، ', $zeroStockProducts));
+        }
+
         $errors = [];
         DB::beginTransaction();
-        $order = Order::create([
-            'branch_id' => $request->branch_id
-        ]);
-        $order_id = $order->id;
+        try {
+            $order = Order::create([
+                'branch_id' => $request->branch_id
+            ]);
+            $order_id = $order->id;
             
             foreach ($request->product as $product_added) {
                 if (!empty($product_added['product_id'])) {
-                    if ($product_added['product_id']) {
-                        if ($product_added['qty'] == null) {
-                            $qty = 0;
-                        } else {
-                            $qty = $product_added['qty'];
-                        }
-                        $product = Product::where('id', $product_added['product_id'])->first();
-                        
-                        $product_on_branch = Product_branch::where(['product_id' => $product_added['product_id'], 'branch_id' => $request['branch_id']])->first();
-                        if (!empty($product_on_branch)) {
-                            $product_on_branch->update(['price' => $product->price]);
-                            $product_on_branch->increment('qty', $qty);
-                        } else {
-                            Product_branch::create([
-                                'product_id' => $product_added['product_id'],
-                                'branch_id' => $request->branch_id,
-                                'qty' => $qty,
-                                'price' => $product->price,
-                                'created_at' => $request->created_at,
-                                'created_by' => auth()->user()->id,
-                                'updated_by' => auth()->user()->id
-                            ]);
-                        }
-                        productAdded::create([
+                    if ($product_added['qty'] == null) {
+                        $qty = 0;
+                    } else {
+                        $qty = $product_added['qty'];
+                    }
+                    $product = Product::where('id', $product_added['product_id'])->first();
+                    
+                    $product_on_branch = Product_branch::where(['product_id' => $product_added['product_id'], 'branch_id' => $request['branch_id']])->first();
+                    if (!empty($product_on_branch)) {
+                        $product_on_branch->update(['price' => $product->price]);
+                        $product_on_branch->increment('qty', $qty);
+                    } else {
+                        Product_branch::create([
                             'product_id' => $product_added['product_id'],
-                            'price' => $product->price,
                             'branch_id' => $request->branch_id,
                             'qty' => $qty,
-                            'order_id' => $order_id,
+                            'price' => $product->price,
                             'created_at' => $request->created_at,
                             'created_by' => auth()->user()->id,
                             'updated_by' => auth()->user()->id
                         ]);
-                        if ($product->stock > $product_added['qty']) {
-                            $product->decrement('stock', $qty);
-                        }
+                    }
+                    ProductAdded::create([
+                        'product_id' => $product_added['product_id'],
+                        'price' => $product->price,
+                        'branch_id' => $request->branch_id,
+                        'qty' => $qty,
+                        'order_id' => $order_id,
+                        'created_at' => $request->created_at,
+                        'created_by' => auth()->user()->id,
+                        'updated_by' => auth()->user()->id
+                    ]);
+                    if ($product->stock > $qty) {
+                        $product->decrement('stock', $qty);
                     }
                 }
+            }
+            DB::commit();
+
+            return redirect()->route('exchanged product')->with(['success' => 'تم تحويل الاصناف بنجاح', 'error' => $errors]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'حدث خطأ أثناء حفظ البيانات: ' . $e->getMessage());
         }
-        DB::commit();
-
-
-        return redirect()->route('exchanged product')->with(['success' => 'تم تحويل الاصناف بنجاح', 'error' => $errors]);
     }
     public function store_branches(Request $request)
     {

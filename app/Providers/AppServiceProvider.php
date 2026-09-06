@@ -21,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::share('branches', Branch::all());
+        try {
+            View::share('branches', Branch::all());
+        } catch (\Throwable $e) {
+            View::share('branches', collect());
+        }
     }
 }

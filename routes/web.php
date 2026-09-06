@@ -111,6 +111,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/', 'index')->name('exchanged product date');
         Route::get('/create', 'create')->name('create exchange product');
         Route::post('/store', 'store')->name('exchange product');
+        Route::post('/check-stock', 'checkStock')->name('product_exchange.check_stock');
     });
 
     Route::group(['prefix' => 'product_increase', 'controller' => IncreasedProductController::class], function ($router) {
