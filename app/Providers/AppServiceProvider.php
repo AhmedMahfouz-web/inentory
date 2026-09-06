@@ -28,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
         }
 
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            // Any logged-in user can access the main dashboard
+            if ($ability === 'dashboard-show') {
+                return true;
+            }
+
             if (
                 $user->hasRole('admin') ||
                 in_array($user->username, ['admin', 'abdallah']) ||

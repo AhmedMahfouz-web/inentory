@@ -167,7 +167,10 @@ class SimplePermissionsSeeder extends Seeder
         $this->command->info("Verified/Created " . count($permissions) . " permissions.");
 
         // Create basic roles if they don't exist
-        $roles = ['admin', 'manager', 'employee', 'warehouse_keeper', 'branch_manager'];
+        $roles = [
+            'admin', 'manager', 'employee', 'warehouse_keeper', 'branch_manager',
+            'امين مخزن', 'أمين مخزن', 'مدير فرع', 'مدير'
+        ];
         
         foreach ($roles as $roleName) {
             Role::firstOrCreate([
@@ -177,17 +180,71 @@ class SimplePermissionsSeeder extends Seeder
         }
 
         // Give admin ALL permissions in the database
-        $adminRole = Role::where('name', 'admin')->first();
-        if ($adminRole) {
-            $allPerms = Permission::all();
-            $adminRole->syncPermissions($allPerms);
-            $this->command->info("Assigned all " . $allPerms->count() . " permissions to admin role");
+        $adminRoles = Role::whereIn('name', ['admin', 'Admin', 'ادمن', 'أدمن'])->get();
+        $allPerms = Permission::all();
+        foreach ($adminRoles as $ar) {
+            $ar->syncPermissions($allPerms);
+        }
+        $this->command->info("Assigned all " . $allPerms->count() . " permissions to admin roles");
+
+        // Warehouse permissions
+        $warehousePerms = [
+            'dashboard-show',
+            'product-show', 'product-create', 'product-edit', 'product-delete',
+            'inventory-show', 'inventory-edit',
+            'product_branch-show', 'product_branch-create', 'product_branch-edit', 'product_branch-delete',
+            'increase-show', 'increase-create', 'increase-edit', 'increase-delete',
+            'product_increased-show', 'product_increased-create', 'product_increased-edit', 'product_increased-delete',
+            'exchange-show', 'exchange-create', 'exchange-edit', 'exchange-delete',
+            'product_added-show', 'product_added-create', 'product_added-edit', 'product_added-delete',
+            'order-show', 'order-create', 'order-edit', 'order-delete', 'order-approve',
+            'order_show', 'order_print', 'order_edit', 'order_delete',
+            'product-request-show', 'product-request-create', 'product-request-edit', 'product-request-delete',
+            'product-request-approve', 'product-request-reject', 'product-request-fulfill', 'product-request-cancel',
+            'start-show', 'start-create', 'start-edit', 'start-delete',
+            'category-show', 'unit-show', 'supplier-show', 'sub_category_show',
+            'report-show', 'report-export',
+        ];
+
+        // Give warehouse permissions to warehouse roles (English and Arabic)
+        $warehouseRoles = Role::whereIn('name', ['warehouse_keeper', 'امين مخزن', 'أمين مخزن'])->get();
+        foreach ($warehouseRoles as $wr) {
+            $wr->syncPermissions($warehousePerms);
+            $this->command->info("Assigned warehouse permissions to role: {$wr->name}");
+        }
+
+        // Give branch_manager permissions
+        $branchManager = Role::where('name', 'branch_manager')->first();
+        if ($branchManager) {
+            $branchManager->syncPermissions([
+                'dashboard-show',
+                'product-show',
+                'inventory-show',
+                'sell-show', 'sell-create', 'sell-edit',
+                'order-show', 'order-create', 'order-edit',
+                'exchange-show', 'exchange-create',
+                'product-request-show', 'product-request-create', 'product-request-edit',
+                'report-show',
+            ]);
+            $this->command->info("Assigned branch permissions to branch_manager role");
+        }
+
+        // Give manager permissions
+        $manager = Role::where('name', 'manager')->first();
+        if ($manager) {
+            $managerPermissions = Permission::whereNotIn('name', [
+                'role-list', 'role-show', 'role-create', 'role-edit', 'role-delete',
+                'user-show', 'user-create', 'user-edit', 'user-delete',
+            ])->get();
+            $manager->syncPermissions($managerPermissions);
+            $this->command->info("Assigned permissions to manager role");
         }
 
         // Give employee basic permissions
         $employeeRole = Role::where('name', 'employee')->first();
         if ($employeeRole) {
             $employeeRole->givePermissionTo([
+                'dashboard-show',
                 'product-request-show',
                 'product-request-create',
             ]);
