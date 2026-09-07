@@ -193,7 +193,10 @@ class ProductAddedController extends Controller
         DB::beginTransaction();
         try {
             $order = Order::create([
-                'branch_id' => $request->branch_id
+                'branch_id' => $request->branch_id,
+                'created_at' => $request->created_at ?? now(),
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
             ]);
             $order_id = $order->id;
             
@@ -249,7 +252,10 @@ class ProductAddedController extends Controller
         $errors = [];
         DB::beginTransaction();
         $order = Order::create([
-            'branch_id' => $request->branch_id
+            'branch_id' => $request->branch_id,
+            'created_at' => $request->created_at ?? now(),
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
         ]);
         $order_id = $order->id;
         foreach ($request->product as $product_added) {
@@ -275,7 +281,9 @@ class ProductAddedController extends Controller
                             'branch_id' => $request->branch_id,
                             'qty' => $qty,
                             'price' => $product->price,
-                            'created_at' => $request->created_at
+                            'created_at' => $request->created_at,
+                            'created_by' => auth()->id(),
+                            'updated_by' => auth()->id(),
                         ]);
                     }
                     productAdded::create([
@@ -284,7 +292,9 @@ class ProductAddedController extends Controller
                         'branch_id' => $request->branch_id,
                         'qty' => $qty,
                         'order_id' => $order_id,
-                        'created_at' => $request->created_at
+                        'created_at' => $request->created_at,
+                        'created_by' => auth()->id(),
+                        'updated_by' => auth()->id(),
                     ]);
                     if ($product->stock > $product_added['qty']) {
                         $product->decrement('stock', $qty);
